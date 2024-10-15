@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,7 +38,12 @@ val items = listOf(
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun CartScreen(navController: NavController, cartItems: List<CartItem>, onDeleteCartItem: (cartItem: CartItem) -> Unit, onCheckout: () -> Unit) {
+fun CartScreen(
+    navController: NavController,
+    cartItems: List<CartItem>,
+    onDeleteCartItem: (cartItem: CartItem) -> Unit,
+    onCheckout: () -> Unit
+) {
 
 
     val customShape =
@@ -73,13 +79,33 @@ fun CartScreen(navController: NavController, cartItems: List<CartItem>, onDelete
             verticalArrangement = Arrangement.SpaceBetween
 
         ) {
-            Text(
-                text = "Cart",
-                style = MaterialTheme.typography.h5,
-                modifier = Modifier.padding(16.dp),
-                color = Color.White,
-                fontWeight = FontWeight.Bold
-            )
+
+
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = { navController.popBackStack() },
+
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.White
+                    )
+                }
+
+                Text(
+                    text = "Cart",
+                    style = MaterialTheme.typography.h5,
+
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
 
             LazyColumn(
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp),
@@ -171,7 +197,8 @@ fun CartItemRow(item: CartItem, onDeleteCartItem: (cartItem: CartItem) -> Unit) 
             Column(
                 Modifier
                     .weight(2f)
-                    .padding(start = 8.dp)) {
+                    .padding(start = 8.dp)
+            ) {
                 Text(text = item.name, fontWeight = FontWeight.Bold)
                 Text(text = formattedPrice, color = Color.Gray, fontWeight = FontWeight.Bold)
             }

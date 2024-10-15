@@ -22,6 +22,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.marketplacepuj.ui.features.catalogo.screens.CartScreen
 import com.example.marketplacepuj.ui.features.catalogo.screens.CatalogueNavScreen
+import com.example.marketplacepuj.ui.features.catalogo.screens.ProfileScreen
 import com.example.marketplacepuj.ui.features.catalogo.viewmodel.CatalogueViewModel
 import com.example.marketplacepuj.ui.theme.MarketplacePUJTheme
 
@@ -79,12 +80,14 @@ fun MyApp() {
                 catalogueViewModel.crearPedido()
             }
         }
+        composable(BottomNavItem.Person.route) {
+            ProfileScreen(navController)
+        }
     }
 }
 
 enum class BottomNavItem(val route: String, val icon: ImageVector, val label: String) {
     Home("home", Icons.Default.Home, "Home"),
-    Search("search", Icons.Default.Search, "Search"),
     ShoppingCart("shoppingCart", Icons.Default.ShoppingCart, "Cart"),
     Person("profile", Icons.Default.Person, "Profile")
 }
