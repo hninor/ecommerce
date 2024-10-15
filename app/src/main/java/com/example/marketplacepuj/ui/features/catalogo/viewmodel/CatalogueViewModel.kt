@@ -3,6 +3,7 @@ package com.example.marketplacepuj.ui.features.catalogo.viewmodel
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.marketplacepuj.ui.features.catalogo.data.Product
 import com.example.marketplacepuj.ui.features.catalogo.screens.CartItem
@@ -17,10 +18,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 
-fun Date.toSimpleString() : String {
+fun Date.toSimpleString(): String {
     val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     return format.format(this)
 }
+
 data class DetallePedido(
     val cantidad: Int,
     val descuento: Int,
@@ -45,6 +47,7 @@ class CatalogueViewModel : ViewModel() {
     val categories = mutableStateListOf<Category>()
     val cartItems = mutableStateListOf<CartItem>()
     val products = mutableListOf<Product>()
+    val selectedCategory = mutableStateOf("")
 
     private val database = Firebase.database
     private val productsRef = database.getReference("productos")
@@ -64,19 +67,36 @@ class CatalogueViewModel : ViewModel() {
                         products.add(product)
                     }
                 }
-                val categoriesLocal = mutableListOf<Category>()
-                val agrupadosCategoria = products.groupBy { it.categoria }
-                var count = 0
-                agrupadosCategoria.forEach {
-                    categoriesLocal.add(Category(++count, it.key, getSubcategories(it.value)))
-                }
-                categories.addAll(categoriesLocal)
+                categories.clear()
+                categories.addAll(getCategories())
             }
 
             override fun onCancelled(error: DatabaseError) {
                 // Manejar errores
             }
         })
+    }
+
+    fun getCategories(): List<Category> {
+        val response = mutableListOf<Category>()
+        val agrupadosCategoria = products.groupBy { it.categoria }
+        var count = 0
+        agrupadosCategoria.forEach {
+            response.add(Category(++count, it.key, getSubcategories(it.value)))
+        }
+        return response
+    }
+
+    fun filterByCategory(nombreCategoria: String) {
+        categories.clear()
+        if (selectedCategory.value == nombreCategoria) {
+            selectedCategory.value = ""
+            categories.addAll(getCategories())
+        } else {
+            selectedCategory.value = nombreCategoria
+            categories.addAll(getCategories().filter { it.name == nombreCategoria })
+        }
+
     }
 
     private fun getSubcategories(products: List<Product>): List<Subcategory> {

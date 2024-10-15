@@ -175,7 +175,14 @@ fun CatalogueNavScreen(navController: NavController, viewModel: CatalogueViewMod
     val navControllerCatalogue = rememberNavController()
     NavHost(navControllerCatalogue, startDestination = "screen_a") {
         composable("screen_a") {
-            CatalogueScreen(categories, navController, navControllerCatalogue)
+            CatalogueScreen(
+                categories,
+                navController,
+                navControllerCatalogue,
+                viewModel.selectedCategory.value
+            ) {
+                viewModel.filterByCategory(it)
+            }
         }
         composable("screen_b/{productId}", arguments = listOf(navArgument("productId") {
             type = NavType.StringType
@@ -196,8 +203,11 @@ fun CatalogueNavScreen(navController: NavController, viewModel: CatalogueViewMod
 fun CatalogueScreen(
     categories: List<Category>,
     navController: NavController,
-    navControllerCatalogue: NavController
-) {
+    navControllerCatalogue: NavController,
+    selectedCategory: String,
+    onFilterCategory: (String) -> Unit,
+
+    ) {
     val customShape =
         RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp, bottomEnd = 32.dp, bottomStart = 32.dp)
     Box(
@@ -264,10 +274,20 @@ fun CatalogueScreen(
                 ) {
 
 
-                CategoryItem(R.drawable.accesorios, "Accesorios")
-                CategoryItem(R.drawable.papeleria, "Papelería")
-                CategoryItem(R.drawable.tshirt, "Ropa")
-                CategoryItem(R.drawable.tecnologia, "Tecnología")
+                CategoryItem(
+                    R.drawable.accesorios,
+                    "Accesorios",
+                    onFilterCategory,
+                    selectedCategory
+                )
+                CategoryItem(R.drawable.papeleria, "Papelería", onFilterCategory, selectedCategory)
+                CategoryItem(R.drawable.tshirt, "Ropa", onFilterCategory, selectedCategory)
+                CategoryItem(
+                    R.drawable.tecnologia,
+                    "Tecnología",
+                    onFilterCategory,
+                    selectedCategory
+                )
 
 
                 // ... otros iconos ...
@@ -313,13 +333,19 @@ fun CatalogueScreen(
 }
 
 @Composable
-fun CategoryItem(icono: Int, categoryName: String) {
+fun CategoryItem(
+    icono: Int,
+    categoryName: String,
+    onFilterCategory: (String) -> Unit,
+    selectedCategory: String
+) {
     Card(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
         modifier = Modifier
-            .size(width = 100.dp, height = 120.dp),
+            .size(width = 100.dp, height = 120.dp)
+            .clickable { onFilterCategory(categoryName) },
 
         ) {
 
@@ -327,12 +353,20 @@ fun CategoryItem(icono: Int, categoryName: String) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFFFF5733), // Orange
-                            Color(0xFFFF7F50) // Lighter orange
+                    brush = if (selectedCategory == categoryName) {
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color(0xFF243484), Color(0xFF2be4dc)
+                            )
                         )
-                    )
+                    } else {
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color(0xFFFF5733), // Orange
+                                Color(0xFFFF7F50) // Lighter orange
+                            )
+                        )
+                    }
                 )
         ) {
 
@@ -435,7 +469,7 @@ fun ProductItem(product: Product, navControllerCatalogue: NavController) {
 @Preview(showBackground = true)
 @Composable
 fun CataloguePreview() {
-    CatalogueScreen(categories, rememberNavController(), rememberNavController())
+    CatalogueScreen(categories, rememberNavController(), rememberNavController(), "", {})
 
 }
 
