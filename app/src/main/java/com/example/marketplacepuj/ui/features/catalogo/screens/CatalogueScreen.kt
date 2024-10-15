@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
@@ -36,8 +38,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -179,7 +184,14 @@ fun CatalogueNavScreen(navController: NavController, viewModel: CatalogueViewMod
                 categories,
                 navController,
                 navControllerCatalogue,
-                viewModel.selectedCategory.value
+                viewModel.selectedCategory.value,
+                viewModel.search, {
+                    viewModel.onValueChangedSearch(it)
+                },
+                {
+                    viewModel.onSearch()
+                }
+
             ) {
                 viewModel.filterByCategory(it)
             }
@@ -205,6 +217,9 @@ fun CatalogueScreen(
     navController: NavController,
     navControllerCatalogue: NavController,
     selectedCategory: String,
+    searchText: String,
+    onValueChangeSearch: (String) -> Unit,
+    onSearch: () -> Unit,
     onFilterCategory: (String) -> Unit,
 
     ) {
@@ -248,15 +263,13 @@ fun CatalogueScreen(
             }
 
             // Barra de búsqueda
-            TextField(
-                value = "",
-                onValueChange = {},
-                placeholder = { Text("Buscar") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp)
-                    .clip(RoundedCornerShape(16.dp))
+
+            SearchTextField(
+                query = searchText,
+                onQueryChanged = onValueChangeSearch,
+                onSearch = onSearch,
             )
+
 
             Text(
                 text = "Categorías",
@@ -330,6 +343,37 @@ fun CatalogueScreen(
 
     }
 
+}
+
+@Composable
+fun SearchTextField(
+    query: String,
+    onQueryChanged: (String) -> Unit,
+    onSearch: () -> Unit
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    TextField(
+        value = query,
+        onValueChange = { onQueryChanged(it) },
+        placeholder = { Text(text = "Buscar") },
+
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp)
+            .clip(RoundedCornerShape(16.dp)),
+        maxLines = 1,
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Search,
+            keyboardType = KeyboardType.Text
+        ),
+        keyboardActions = KeyboardActions(
+            onSearch = {
+                keyboardController?.hide()
+                onSearch()
+            }
+
+        )
+    )
 }
 
 @Composable
@@ -469,7 +513,15 @@ fun ProductItem(product: Product, navControllerCatalogue: NavController) {
 @Preview(showBackground = true)
 @Composable
 fun CataloguePreview() {
-    CatalogueScreen(categories, rememberNavController(), rememberNavController(), "", {})
+    CatalogueScreen(
+        categories,
+        rememberNavController(),
+        rememberNavController(),
+        "",
+        "",
+        {},
+        {},
+        {})
 
 }
 

@@ -2,8 +2,10 @@ package com.example.marketplacepuj.ui.features.catalogo.viewmodel
 
 
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.marketplacepuj.ui.features.catalogo.data.Product
 import com.example.marketplacepuj.ui.features.catalogo.screens.CartItem
@@ -14,9 +16,17 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import java.text.Normalizer
 import java.text.SimpleDateFormat
 import java.util.Date
 
+
+private val REGEX_UNACCENT = "\\p{InCombiningDiacriticalMarks}+".toRegex()
+
+fun CharSequence.unaccent(): String {
+    val temp = Normalizer.normalize(this, Normalizer.Form.NFD)
+    return REGEX_UNACCENT.replace(temp, "")
+}
 
 fun Date.toSimpleString(): String {
     val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
@@ -48,6 +58,8 @@ class CatalogueViewModel : ViewModel() {
     val cartItems = mutableStateListOf<CartItem>()
     val products = mutableListOf<Product>()
     val selectedCategory = mutableStateOf("")
+    var search by mutableStateOf("")
+        private set
 
     private val database = Firebase.database
     private val productsRef = database.getReference("productos")
@@ -68,7 +80,7 @@ class CatalogueViewModel : ViewModel() {
                     }
                 }
                 categories.clear()
-                categories.addAll(getCategories())
+                categories.addAll(getCategories(products))
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -77,7 +89,7 @@ class CatalogueViewModel : ViewModel() {
         })
     }
 
-    fun getCategories(): List<Category> {
+    fun getCategories(products: List<Product>): List<Category> {
         val response = mutableListOf<Category>()
         val agrupadosCategoria = products.groupBy { it.categoria }
         var count = 0
@@ -91,10 +103,10 @@ class CatalogueViewModel : ViewModel() {
         categories.clear()
         if (selectedCategory.value == nombreCategoria) {
             selectedCategory.value = ""
-            categories.addAll(getCategories())
+            categories.addAll(getCategories(products))
         } else {
             selectedCategory.value = nombreCategoria
-            categories.addAll(getCategories().filter { it.name == nombreCategoria })
+            categories.addAll(getCategories(products).filter { it.name == nombreCategoria })
         }
 
     }
@@ -197,5 +209,20 @@ class CatalogueViewModel : ViewModel() {
         return response
 
 
+    }
+
+    fun onValueChangedSearch(value: String) {
+        search = value
+    }
+
+    fun onSearch() {
+        val filteredProducts = products.filter {
+            it.categoria.unaccent().contains(search, true) || it.subcategoria.unaccent()
+                .contains(search, true) || it.nombre.unaccent()
+                .contains(search, true) || it.descripcion.unaccent().contains(search, true)
+        }
+        categories.clear()
+        categories.addAll(getCategories(filteredProducts))
+        search = ""
     }
 }
