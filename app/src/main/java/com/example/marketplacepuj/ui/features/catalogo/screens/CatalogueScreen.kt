@@ -8,17 +8,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -26,13 +24,13 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -40,17 +38,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import coil3.compose.AsyncImage
 import com.example.marketplacepuj.BottomNavItem
 import com.example.marketplacepuj.R
+import com.example.marketplacepuj.ui.features.catalogo.viewmodel.CatalogueViewModel
 
 
 data class Category(
@@ -63,24 +65,88 @@ data class Subcategory(
 
 // Datos de muestra (dummy data)
 data class Product(
-    val id: Int,
+    val id: String,
     val name: String,
     val category: String,
     val subCategory: String,
     val imageUrl: String,
-    val price: Double
+    val price: Double,
+    val description: String = ""
 )
 
 val products = listOf(
-    Product(1, "iPhone 14", "Telefonía", "Smartphones", "https://via.placeholder.com/150", 999.99),
-    Product(1, "iPhone 14", "Telefonía", "Smartphones", "https://via.placeholder.com/150", 999.99),
-    Product(1, "iPhone 14", "Telefonía", "Smartphones", "https://via.placeholder.com/150", 999.99),
-    Product(1, "iPhone 14", "Telefonía", "Smartphones", "https://via.placeholder.com/150", 999.99),
-    Product(1, "iPhone 14", "Telefonía", "Smartphones", "https://via.placeholder.com/150", 999.99),
-    Product(1, "iPhone 14", "Telefonía", "Smartphones", "https://via.placeholder.com/150", 999.99),
-    Product(1, "iPhone 14", "Telefonía", "Smartphones", "https://via.placeholder.com/150", 999.99),
-    Product(1, "iPhone 14", "Telefonía", "Smartphones", "https://via.placeholder.com/150", 999.99),
-    Product(1, "iPhone 14", "Telefonía", "Smartphones", "https://via.placeholder.com/150", 999.99),
+    Product(
+        "1",
+        "iPhone 14",
+        "Telefonía",
+        "Smartphones",
+        "https://via.placeholder.com/150",
+        999.99
+    ),
+    Product(
+        "1",
+        "iPhone 14",
+        "Telefonía",
+        "Smartphones",
+        "https://via.placeholder.com/150",
+        999.99
+    ),
+    Product(
+        "1",
+        "iPhone 14",
+        "Telefonía",
+        "Smartphones",
+        "https://via.placeholder.com/150",
+        999.99
+    ),
+    Product(
+        "1",
+        "iPhone 14",
+        "Telefonía",
+        "Smartphones",
+        "https://via.placeholder.com/150",
+        999.99
+    ),
+    Product(
+        "1",
+        "iPhone 14",
+        "Telefonía",
+        "Smartphones",
+        "https://via.placeholder.com/150",
+        999.99
+    ),
+    Product(
+        "1",
+        "iPhone 14",
+        "Telefonía",
+        "Smartphones",
+        "https://via.placeholder.com/150",
+        999.99
+    ),
+    Product(
+        "1",
+        "iPhone 14",
+        "Telefonía",
+        "Smartphones",
+        "https://via.placeholder.com/150",
+        999.99
+    ),
+    Product(
+        "1",
+        "iPhone 14",
+        "Telefonía",
+        "Smartphones",
+        "https://via.placeholder.com/150",
+        999.99
+    ),
+    Product(
+        "1",
+        "iPhone 14",
+        "Telefonía",
+        "Smartphones",
+        "https://via.placeholder.com/150",
+        999.99
+    ),
     // ... más productos
 )
 
@@ -104,27 +170,52 @@ val categories = listOf(
 
 
 @Composable
-fun CatalogueNavScreen(categories: List<Category>, navController: NavController) {
+fun CatalogueNavScreen(navController: NavController, viewModel: CatalogueViewModel) {
+    val categories = viewModel.categories
     val navControllerCatalogue = rememberNavController()
     NavHost(navControllerCatalogue, startDestination = "screen_a") {
         composable("screen_a") {
             CatalogueScreen(categories, navController, navControllerCatalogue)
         }
-        composable("screen_b") {
-            ProductDetailScreen(navControllerCatalogue)
+        composable("screen_b/{productId}", arguments = listOf(navArgument("productId") {
+            type = NavType.StringType
+        })) { backStackEntry ->
+            val productId = backStackEntry.arguments?.getString("productId")
+            val product = viewModel.getProductDetail(productId)
+            product?.let {
+                ProductDetailScreen(navControllerCatalogue, it) {
+                    viewModel.addToCartItem(it)
+                    navControllerCatalogue.popBackStack()
+                }
+            }
         }
     }
 }
+
 @Composable
-fun CatalogueScreen(categories: List<Category>, navController: NavController, navControllerCatalogue: NavController) {
+fun CatalogueScreen(
+    categories: List<Category>,
+    navController: NavController,
+    navControllerCatalogue: NavController
+) {
     val customShape =
         RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp, bottomEnd = 32.dp, bottomStart = 32.dp)
-    Box {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color.White, // Orange
+                        Color(0xFFF2F2F2) // Lighter orange
+                    )
+                )
+            )
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
-
+                .padding(bottom = 72.dp)
         ) {
 
 
@@ -137,10 +228,12 @@ fun CatalogueScreen(categories: List<Category>, navController: NavController, na
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Catalogue", fontWeight = FontWeight.Bold, fontSize = 20.sp
+                    text = "Catálogo", fontWeight = FontWeight.Bold, fontSize = 20.sp
                 )
                 Icon(
-                    imageVector = Icons.Default.Menu, contentDescription = "Menu"
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Menu",
+                    Modifier.clickable { }
                 )
             }
 
@@ -148,105 +241,34 @@ fun CatalogueScreen(categories: List<Category>, navController: NavController, na
             TextField(
                 value = "",
                 onValueChange = {},
-                placeholder = { Text("Search") },
+                placeholder = { Text("Buscar") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(start = 16.dp, end = 16.dp)
                     .clip(RoundedCornerShape(16.dp))
             )
 
-            Text(text = "Lorem ipsumerat", modifier = Modifier.padding(start = 16.dp))
+            Text(
+                text = "Categorías",
+                modifier = Modifier.padding(start = 16.dp, top = 8.dp)
+            )
 
             // Sección de iconos grandes
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
                     .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.SpaceEvenly,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
 
                 ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_user), // Reemplaza con tu icono
-                    contentDescription = "Bike",
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
-                        .height(120.dp)
-                        .width(100.dp)
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    Color(0xFFFF5733), // Orange
-                                    Color(0xFFFF7F50) // Lighter orange
-                                )
-                            )
-                        )
-                        .padding(8.dp)
 
 
-                )
+                CategoryItem(R.drawable.accesorios, "Accesorios")
+                CategoryItem(R.drawable.papeleria, "Papelería")
+                CategoryItem(R.drawable.tshirt, "Ropa")
+                CategoryItem(R.drawable.tecnologia, "Tecnología")
 
-                Spacer(modifier = Modifier.padding(8.dp))
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_user), // Reemplaza con tu icono
-                    contentDescription = "Bike",
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
-                        .height(120.dp)
-                        .width(100.dp)
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    Color(0xFFFF5733), // Orange
-                                    Color(0xFFFF7F50) // Lighter orange
-                                )
-                            )
-                        )
-                        .padding(8.dp)
-
-
-                )
-                Spacer(modifier = Modifier.padding(8.dp))
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_user), // Reemplaza con tu icono
-                    contentDescription = "Bike",
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
-                        .height(120.dp)
-                        .width(100.dp)
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    Color(0xFFFF5733), // Orange
-                                    Color(0xFFFF7F50) // Lighter orange
-                                )
-                            )
-                        )
-                        .padding(8.dp)
-
-
-                )
-
-                Spacer(modifier = Modifier.padding(8.dp))
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_user), // Reemplaza con tu icono
-                    contentDescription = "Bike",
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
-                        .height(120.dp)
-                        .width(100.dp)
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    Color(0xFFFF5733), // Orange
-                                    Color(0xFFFF7F50) // Lighter orange
-                                )
-                            )
-                        )
-                        .padding(8.dp)
-
-
-                )
 
                 // ... otros iconos ...
             }
@@ -277,20 +299,81 @@ fun CatalogueScreen(categories: List<Category>, navController: NavController, na
             }
 
 
-            // Secciones de subcategorías
+        }
 
+        BottomNavigationBar(
+            navController = navController, modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)
+                .clip(customShape)
+        )
 
-            // ... otras subcategorías ...
+    }
+
+}
+
+@Composable
+fun CategoryItem(icono: Int, categoryName: String) {
+    Card(
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp
+        ),
+        modifier = Modifier
+            .size(width = 100.dp, height = 120.dp),
+
+        ) {
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFFFF5733), // Orange
+                            Color(0xFFFF7F50) // Lighter orange
+                        )
+                    )
+                )
+        ) {
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .align(Center),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .background(Color.White),
+                    contentAlignment = Center
+                ) {
+                    Icon(
+                        painter = painterResource(icono), // Reemplaza con tu icono
+                        contentDescription = "Bike",
+                        modifier = Modifier
+                            .size(45.dp),
+                        tint = Color(0xFFFF5733)
+                    )
+                }
+
+                Text(
+                    categoryName,
+                    fontSize = 12.sp,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(4.dp)
+                )
+            }
 
 
         }
 
-        BottomNavigationBar(navController = navController, modifier = Modifier
-            .align(Alignment.BottomCenter)
-            .padding(32.dp)
-            .clip(customShape))
 
     }
+
 
 }
 
@@ -300,25 +383,51 @@ fun ProductItem(product: Product, navControllerCatalogue: NavController) {
 
     Card(
         modifier = Modifier
-            .fillMaxWidth()
+            .size(width = 100.dp, height = 120.dp)
             .clickable {
-                navControllerCatalogue.navigate("screen_b")
+                navControllerCatalogue.navigate("screen_b/${product.id}")
+            },
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp
+        )
+    ) {
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.linearGradient(
+                        listOf(Color(0xFF2be4dc), Color(0xFF243484))
+                    )
+                )
+        ) {
+            Column(
+                modifier = Modifier
+                    .align(Center)
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                AsyncImage(
+                    model = product.imageUrl,
+                    contentDescription = product.name,
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+
+                Text(
+                    product.name,
+                    fontSize = 12.sp,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(4.dp)
+                )
+
             }
 
-    ) {
-        Column(
-            modifier = Modifier.padding(8.dp)
-        ) {
-            AsyncImage(
-                model = product.imageUrl,
-                contentDescription = product.name,
-                modifier = Modifier.size(80.dp),
-                contentScale = ContentScale.Crop
-            )
-
-            Text(product.name, fontSize = 14.sp)
-
         }
+
     }
 }
 
@@ -356,3 +465,4 @@ fun BottomNavigationBar(navController: NavController, modifier: Modifier) {
         }
     }
 }
+

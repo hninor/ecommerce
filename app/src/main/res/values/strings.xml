@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">MarketplacePUJ</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="correo_electronico">Correo</string>
+    <string name="contrasena">Password</string>
+    <string name="iniciar_sesion">Iniciar sesion</string>
+    <string name="logo_app">Logo APP</string>
+    <string name="registrarse">Crear cuenta</string>
+    <string name="olvide_mi_contrasena">Olvide mi contraseña</string>
+    <string name="imagen_para_registro_usuario">Imagen para registro usuario</string>
+    <string name="my_messages">Mis mensajes</string>
+    <string name="write_message">Escribe un mensaje</string>
+    <string name="send">Enviar</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,26 +20,41 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil3.compose.AsyncImage
+import java.text.NumberFormat
+
+
+val items = listOf(
+    CartItem("Lorem ipsum dolor sit", 1000.0, ""),
+    CartItem("Lorem ipsum dolor sit", 1000.0, ""),
+    CartItem("Lorem ipsum dolor sit", 1000.0, ""),
+    CartItem("Lorem ipsum dolor sit", 1000.0, ""),
+    CartItem("Lorem ipsum dolor sit", 1000.0, ""),
+    CartItem("Lorem ipsum dolor sit", 1000.0, ""),
+    CartItem("Lorem ipsum dolor sit", 1000.0, ""),
+    CartItem("Lorem ipsum dolor sit", 1000.0, ""),
+)
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun CartScreen(navController: NavController) {
+fun CartScreen(navController: NavController, cartItems: List<CartItem>, onDeleteCartItem: (cartItem: CartItem) -> Unit, onCheckout: () -> Unit) {
+
 
     val customShape =
         RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp, bottomEnd = 32.dp, bottomStart = 32.dp)
-    val items = listOf(
-        CartItem("Lorem ipsum dolor sit", "$1000.00"),
-        CartItem("Lorem ipsum dolor sit", "$1000.00"),
-        CartItem("Lorem ipsum dolor sit", "$1000.00"),
-        CartItem("Lorem ipsum dolor sit", "$1000.00")
-    )
 
+    val total = cartItems.sumOf { it.price }
+
+    val formatter = NumberFormat.getCurrencyInstance().apply {
+        maximumFractionDigits = 0
+    }
+    val formattedPrice = formatter.format(total)
     Scaffold(
         bottomBar = {
 
             BottomNavigationBar(
                 navController = navController, modifier = Modifier
-                    .padding(32.dp)
+                    .padding(16.dp)
                     .clip(customShape)
             )
 
@@ -51,10 +65,13 @@ fun CartScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    Brush.radialGradient(
-                        listOf(Color(0xFF2be4dc), Color(0xFF243484))
+                    Brush.verticalGradient(
+                        listOf(Color(0xFF243484), Color(0xFF2be4dc))
                     )
                 )
+                .padding(bottom = 72.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+
         ) {
             Text(
                 text = "Cart",
@@ -65,55 +82,69 @@ fun CartScreen(navController: NavController) {
             )
 
             LazyColumn(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.weight(2f)
             ) {
-                items(items) { item ->
-                    CartItemRow(item = item)
+                items(cartItems) { item ->
+                    CartItemRow(item = item, onDeleteCartItem)
                 }
 
-                item {
-                    // Total
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Total:",
-                            style = MaterialTheme.typography.h6,
-                            color = Color.White
-                        )
-                        Text(
-                            text = "$4000.00",
-                            style = MaterialTheme.typography.h6,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
 
-                    // Botón Checkout
-                    Button(
-                        onClick = { /* Handle checkout click */ },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color(0xFFFF7F50), // Naranja claro
-                            contentColor = Color.White
-                        ),
-                    ) {
-                        Text(text = "Checkout")
-                    }
-                }
             }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Column {
+                    Text(
+                        text = "Total:",
+                        style = MaterialTheme.typography.subtitle1,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.LightGray
+                    )
+                    Text(
+                        text = formattedPrice,
+                        style = MaterialTheme.typography.h6,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                // Botón Checkout
+                Button(
+                    onClick = { onCheckout() },
+                    modifier = Modifier
+                        .padding(8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color(0xFFFF7F50), // Naranja claro
+                        contentColor = Color.White
+                    ),
+                    enabled = total != 0.0
+                ) {
+                    Text(text = "Checkout")
+                }
+
+            }
+
+
         }
     }
 }
 
 @Composable
-fun CartItemRow(item: CartItem) {
+fun CartItemRow(item: CartItem, onDeleteCartItem: (cartItem: CartItem) -> Unit) {
+
+    val formatter = NumberFormat.getCurrencyInstance().apply {
+        maximumFractionDigits = 0
+    }
+    val formattedPrice = formatter.format(item.price)
+
     Card(
         shape = RoundedCornerShape(16.dp), // Adjust the corner radius as needed
         elevation = 4.dp,
@@ -129,17 +160,22 @@ fun CartItemRow(item: CartItem) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                Icons.Default.Person,
-                contentDescription = "Product image",
-                modifier = Modifier.padding(16.dp)
-            )
 
-            Column {
+            AsyncImage(
+                model = item.imageUrl, // Reemplaza con tu imagen
+                contentDescription = "Imagen centrada",
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .size(60.dp),
+            )
+            Column(
+                Modifier
+                    .weight(2f)
+                    .padding(start = 8.dp)) {
                 Text(text = item.name, fontWeight = FontWeight.Bold)
-                Text(text = item.price, color = Color.Gray, fontWeight = FontWeight.Bold)
+                Text(text = formattedPrice, color = Color.Gray, fontWeight = FontWeight.Bold)
             }
-            IconButton(onClick = { /* Handle remove item */ }) {
+            IconButton(onClick = { onDeleteCartItem(item) }) {
                 Icon(
                     Icons.Default.Close,
                     contentDescription = "Remove",
@@ -153,12 +189,12 @@ fun CartItemRow(item: CartItem) {
     }
 }
 
-data class CartItem(val name: String, val price: String)
+data class CartItem(val name: String, val price: Double, val imageUrl: String)
 
 @Preview(showBackground = true)
 @Composable
 fun CartPreview() {
-    CartScreen(rememberNavController())
+    CartScreen(rememberNavController(), items, {}, {})
 
 }
 
