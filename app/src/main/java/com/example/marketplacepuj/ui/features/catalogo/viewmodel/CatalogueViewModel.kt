@@ -223,6 +223,9 @@ class CatalogueViewModel : ViewModel() {
         }
         categories.clear()
         categories.addAll(getCategories(filteredProducts))
-        search = ""
+        if (categories.isNotEmpty()) {
+            search = ""
+        }
+
     }
 }
