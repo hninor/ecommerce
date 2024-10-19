@@ -24,6 +24,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
+import com.example.marketplacepuj.ui.features.screen_add_card.AddCardScreen
 import java.text.NumberFormat
 
 
@@ -66,7 +67,9 @@ fun CartScreenHost(
         }
 
         composable("add_card") {
-
+            AddCardScreen(onBack = {
+                navControllerCart.popBackStack()
+            })
         }
     }
 }

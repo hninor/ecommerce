@@ -2,12 +2,12 @@ package com.example.marketplacepuj.ui.features.screen_add_card
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import by.alexandr7035.banking.domain.features.cards.AddCardUseCase
 import com.example.marketplacepuj.domain.validation.ValidateBillingAddressUseCase
 import com.example.marketplacepuj.domain.validation.ValidateCardExpirationUseCase
 import com.example.marketplacepuj.domain.validation.ValidateCardHolderUseCase
 import com.example.marketplacepuj.domain.validation.ValidateCardNumberUseCase
 import com.example.marketplacepuj.domain.validation.ValidateCvvCodeUseCase
+import com.example.marketplacepuj.ui.features.cards.AddCardUseCase
 import com.example.marketplacepuj.ui.features.cards.model.AddCardPayload
 import com.example.marketplacepuj.util.AppError
 import com.example.marketplacepuj.util.ErrorType
@@ -37,9 +37,9 @@ class AddCardViewModel(
 
         when (intent) {
             is AddCardIntent.EnterScreen -> {
-                //if (BuildConfig.DEBUG) {
-                 //   reduceInitialMockState()
-                //}
+
+                //reduceInitialMockState()
+
             }
 
             is AddCardIntent.StringFieldChanged -> {

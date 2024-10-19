@@ -206,7 +206,7 @@ fun PaymentScreen_Ui(
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp),
             text = stringResource(R.string.proceed),
-            isEnabled = total != 0.0
+            isEnabled = state.cards.isNotEmpty()
         )
         TextBtn(
             onClick = { navController.popBackStack() },

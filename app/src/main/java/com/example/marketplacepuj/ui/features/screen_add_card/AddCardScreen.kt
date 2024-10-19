@@ -15,9 +15,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -34,8 +38,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.marketplacepuj.util.snackbar.SnackBarMode
 import com.example.marketplacepuj.R
 import com.example.marketplacepuj.ui.theme.primaryFontFamily
 import com.example.marketplacepuj.util.CardNumberField
@@ -46,11 +48,12 @@ import com.example.marketplacepuj.util.OperationResult
 import com.example.marketplacepuj.util.PrimaryButton
 import com.example.marketplacepuj.util.PrimaryTextField
 import com.example.marketplacepuj.util.ReadonlyTextField
+import com.example.marketplacepuj.util.ScopedSnackBarState
 import com.example.marketplacepuj.util.ScreenPreview
 import com.example.marketplacepuj.util.SecondaryToolBar
 import com.example.marketplacepuj.util.UiText
 import com.example.marketplacepuj.util.asUiTextError
-import com.google.firebase.database.core.view.View
+import com.example.marketplacepuj.util.snackbar.SnackBarMode
 import de.palm.composestateevents.EventEffect
 import org.koin.androidx.compose.koinViewModel
 
@@ -60,38 +63,54 @@ fun AddCardScreen(
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
 
-    AddCardScreen_Ui(onBack = onBack, state = state, onIntent = { viewModel.emitIntent(it) })
 
-    LaunchedEffect(Unit) {
-        viewModel.emitIntent(AddCardIntent.EnterScreen)
-    }
+    val snackBarHostState = remember { SnackbarHostState() }
+    val hostCoroutineScope = rememberCoroutineScope()
 
-    val ctx = LocalContext.current
-    val snackbarState = LocalScopedSnackbarState.current
+    CompositionLocalProvider(
+        LocalScopedSnackbarState provides ScopedSnackBarState(
+            value = snackBarHostState,
+            coroutineScope = hostCoroutineScope
+        )
+    ) {
 
-    EventEffect(
-        event = state.cardSavedEvent,
-        onConsumed = viewModel::consumeSaveCardEvent,
-        action = { result ->
-            when (result) {
-                is OperationResult.Success -> {
-                    snackbarState.show(
-                        message = "Card added",
-                        snackBarMode = SnackBarMode.Positive
-                    )
+        AddCardScreen_Ui(onBack = onBack, state = state, onIntent = { viewModel.emitIntent(it) })
 
-                    onBack.invoke()
-                }
+        LaunchedEffect(Unit) {
+            viewModel.emitIntent(AddCardIntent.EnterScreen)
+        }
 
-                is OperationResult.Failure -> {
-                    snackbarState.show(
-                        message = result.error.errorType.asUiTextError().asString(ctx),
-                        snackBarMode = SnackBarMode.Negative
-                    )
+        val ctx = LocalContext.current
+        val snackbarState = LocalScopedSnackbarState.current
+
+        EventEffect(
+            event = state.cardSavedEvent,
+            onConsumed = viewModel::consumeSaveCardEvent,
+            action = { result ->
+                when (result) {
+                    is OperationResult.Success -> {
+                        snackbarState.show(
+                            message = "Card added",
+                            snackBarMode = SnackBarMode.Positive
+                        )
+
+                        onBack.invoke()
+                    }
+
+                    is OperationResult.Failure -> {
+                        snackbarState.show(
+                            message = result.error.errorType.asUiTextError().asString(ctx),
+                            snackBarMode = SnackBarMode.Negative
+                        )
+                    }
                 }
             }
-        }
-    )
+        )
+    }
+
+
+
+
 }
 
 @Composable

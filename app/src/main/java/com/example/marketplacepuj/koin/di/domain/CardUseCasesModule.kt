@@ -1,6 +1,6 @@
 package by.alexandr7035.banking.core.di.domain
 
-import by.alexandr7035.banking.domain.features.cards.AddCardUseCase
+import com.example.marketplacepuj.ui.features.cards.AddCardUseCase
 import by.alexandr7035.banking.domain.features.cards.GetAllCardsUseCase
 import by.alexandr7035.banking.domain.features.cards.GetCardByIdUseCase
 import by.alexandr7035.banking.domain.features.cards.GetDefaultCardUseCase
