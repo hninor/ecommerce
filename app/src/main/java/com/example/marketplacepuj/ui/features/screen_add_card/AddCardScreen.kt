@@ -15,13 +15,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -48,7 +44,6 @@ import com.example.marketplacepuj.util.OperationResult
 import com.example.marketplacepuj.util.PrimaryButton
 import com.example.marketplacepuj.util.PrimaryTextField
 import com.example.marketplacepuj.util.ReadonlyTextField
-import com.example.marketplacepuj.util.ScopedSnackBarState
 import com.example.marketplacepuj.util.ScreenPreview
 import com.example.marketplacepuj.util.SecondaryToolBar
 import com.example.marketplacepuj.util.UiText
@@ -64,51 +59,41 @@ fun AddCardScreen(
     val state = viewModel.state.collectAsStateWithLifecycle().value
 
 
-    val snackBarHostState = remember { SnackbarHostState() }
-    val hostCoroutineScope = rememberCoroutineScope()
 
-    CompositionLocalProvider(
-        LocalScopedSnackbarState provides ScopedSnackBarState(
-            value = snackBarHostState,
-            coroutineScope = hostCoroutineScope
-        )
-    ) {
 
-        AddCardScreen_Ui(onBack = onBack, state = state, onIntent = { viewModel.emitIntent(it) })
 
-        LaunchedEffect(Unit) {
-            viewModel.emitIntent(AddCardIntent.EnterScreen)
-        }
+    AddCardScreen_Ui(onBack = onBack, state = state, onIntent = { viewModel.emitIntent(it) })
 
-        val ctx = LocalContext.current
-        val snackbarState = LocalScopedSnackbarState.current
-
-        EventEffect(
-            event = state.cardSavedEvent,
-            onConsumed = viewModel::consumeSaveCardEvent,
-            action = { result ->
-                when (result) {
-                    is OperationResult.Success -> {
-                        snackbarState.show(
-                            message = "Card added",
-                            snackBarMode = SnackBarMode.Positive
-                        )
-
-                        onBack.invoke()
-                    }
-
-                    is OperationResult.Failure -> {
-                        snackbarState.show(
-                            message = result.error.errorType.asUiTextError().asString(ctx),
-                            snackBarMode = SnackBarMode.Negative
-                        )
-                    }
-                }
-            }
-        )
+    LaunchedEffect(Unit) {
+        viewModel.emitIntent(AddCardIntent.EnterScreen)
     }
 
+    val ctx = LocalContext.current
+    val snackbarState = LocalScopedSnackbarState.current
 
+    EventEffect(
+        event = state.cardSavedEvent,
+        onConsumed = viewModel::consumeSaveCardEvent,
+        action = { result ->
+            when (result) {
+                is OperationResult.Success -> {
+                    snackbarState.show(
+                        message = "Card added",
+                        snackBarMode = SnackBarMode.Positive
+                    )
+
+                    onBack.invoke()
+                }
+
+                is OperationResult.Failure -> {
+                    snackbarState.show(
+                        message = result.error.errorType.asUiTextError().asString(ctx),
+                        snackBarMode = SnackBarMode.Negative
+                    )
+                }
+            }
+        }
+    )
 
 
 }

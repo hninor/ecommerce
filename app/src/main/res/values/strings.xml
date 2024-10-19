@@ -49,4 +49,9 @@
     <string name="balance">Balance</string>
     <string name="proceed">Proceed</string>
     <string name="cancel">Cancel</string>
+    <string name="card_details">Card details</string>
+    <string name="set_card_as_default">Set card as default</string>
+    <string name="remove_card">Remove card</string>
+    <string name="billing_address">Billing Address</string>
+    <string name="added_on">Added On</string>
 </resources>

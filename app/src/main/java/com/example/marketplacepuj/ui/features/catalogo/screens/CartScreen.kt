@@ -10,7 +10,11 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,11 +24,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import coil3.compose.AsyncImage
+import com.example.marketplacepuj.ui.features.payment.carddetail.CardDetailsScreen
 import com.example.marketplacepuj.ui.features.screen_add_card.AddCardScreen
+import com.example.marketplacepuj.util.LocalScopedSnackbarState
+import com.example.marketplacepuj.util.ScopedSnackBarState
 import java.text.NumberFormat
 
 
@@ -48,30 +57,58 @@ fun CartScreenHost(
     onProceed: () -> Unit
 ) {
     val navControllerCart = rememberNavController()
-    NavHost(navControllerCart, startDestination = "cart") {
-        composable("cart") {
-            CartScreen(
-                navController,
-                cartItems,
-                { onDeleteCartItem(it) }) {
-                navControllerCart
-                    .navigate("payment")
+    val snackBarHostState = remember { SnackbarHostState() }
+    val hostCoroutineScope = rememberCoroutineScope()
+
+    CompositionLocalProvider(
+        LocalScopedSnackbarState provides ScopedSnackBarState(
+            value = snackBarHostState,
+            coroutineScope = hostCoroutineScope
+        )
+    ) {
+        NavHost(navControllerCart, startDestination = "cart") {
+            composable("cart") {
+                CartScreen(
+                    navController,
+                    cartItems,
+                    { onDeleteCartItem(it) }) {
+                    navControllerCart
+                        .navigate("payment")
+                }
+            }
+            composable("payment") {
+                PaymentScreen(
+                    navController = navControllerCart,
+                    total = cartItems.sumOf { it.price },
+                    onProceed = onProceed,
+                    onCardDetails = {
+                        navControllerCart.navigate("cardDetails/$it")
+                    }
+                )
+            }
+
+            composable("add_card") {
+                AddCardScreen(onBack = {
+                    navControllerCart.popBackStack()
+                })
+            }
+
+            composable(
+                route = "cardDetails/{cardId}",
+                arguments = listOf(navArgument("cardId") { type = NavType.StringType })
+            ) {
+                val cardId = it.arguments?.getString("cardId")!!
+
+                CardDetailsScreen(
+                    cardId = cardId,
+                    onBack = {
+                        navControllerCart.popBackStack()
+                    }
+                )
             }
         }
-        composable("payment") {
-            PaymentScreen(
-                navController = navControllerCart,
-                total = cartItems.sumOf { it.price },
-                onProceed = onProceed
-            )
-        }
-
-        composable("add_card") {
-            AddCardScreen(onBack = {
-                navControllerCart.popBackStack()
-            })
-        }
     }
+
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
