@@ -121,6 +121,7 @@ dependencies {
     val koin_version = "3.4.3"
     implementation("io.insert-koin:koin-androidx-compose:$koin_version")
     implementation("io.insert-koin:koin-androidx-workmanager:$koin_version")
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 
 
 }

@@ -1,5 +1,6 @@
 package com.example.marketplacepuj.koin.di.domain
 
+import by.alexandr7035.banking.domain.features.cards.GetHomeCardsUseCase
 import com.example.marketplacepuj.domain.validation.ValidateBillingAddressUseCase
 import com.example.marketplacepuj.domain.validation.ValidateCardExpirationUseCase
 import com.example.marketplacepuj.domain.validation.ValidateCardHolderUseCase
@@ -17,4 +18,5 @@ val validationUseCasesModule = module {
     factory { ValidateCardHolderUseCase() }
     factory { ValidatePasswordUseCase() }
     factory { ValidateEmailUseCase() }
+    factory { GetHomeCardsUseCase(get()) }
 }

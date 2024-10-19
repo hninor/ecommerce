@@ -13,7 +13,6 @@ data class MoneyAmountUi(
         fun mapFromDomain(balance: MoneyAmount): MoneyAmountUi {
             val symbols = DecimalFormatSymbols(Locale.US)
             val decimalFormat = DecimalFormat("#,##0.##", symbols)
-            decimalFormat.isGroupingUsed = false
             val formattedValue = decimalFormat.format(balance.value)
 
 

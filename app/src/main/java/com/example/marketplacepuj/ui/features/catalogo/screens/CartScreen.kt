@@ -20,6 +20,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import java.text.NumberFormat
@@ -35,6 +37,39 @@ val items = listOf(
     CartItem("Lorem ipsum dolor sit", 1000.0, ""),
     CartItem("Lorem ipsum dolor sit", 1000.0, ""),
 )
+
+
+@Composable
+fun CartScreenHost(
+    navController: NavController,
+    cartItems: List<CartItem>,
+    onDeleteCartItem: (cartItem: CartItem) -> Unit,
+    onProceed: () -> Unit
+) {
+    val navControllerCart = rememberNavController()
+    NavHost(navControllerCart, startDestination = "cart") {
+        composable("cart") {
+            CartScreen(
+                navController,
+                cartItems,
+                { onDeleteCartItem(it) }) {
+                navControllerCart
+                    .navigate("payment")
+            }
+        }
+        composable("payment") {
+            PaymentScreen(
+                navController = navControllerCart,
+                total = cartItems.sumOf { it.price },
+                onProceed = onProceed
+            )
+        }
+
+        composable("add_card") {
+
+        }
+    }
+}
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -82,14 +117,16 @@ fun CartScreen(
 
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
                     onClick = { navController.popBackStack() },
 
-                ) {
+                    ) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = "Back",

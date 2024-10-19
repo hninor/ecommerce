@@ -49,3 +49,11 @@ val primaryFontFamily = FontFamily(
         FontWeight.SemiBold
     )
 )
+
+
+val ubuntuFontFamily = FontFamily(
+    androidx.compose.ui.text.font.Font(
+        R.font.ubuntu,
+        FontWeight.Normal
+    ),
+)

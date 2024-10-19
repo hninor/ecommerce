@@ -43,4 +43,10 @@
     <string name="insufficient_card_balance">Insufficient card balance.</string>
     <string name="transaction_not_found">Transaction not found</string>
     <string name="save_card">Save Card</string>
+    <string name="default_card">Default card</string>
+    <string name="error_happened">An error happened...</string>
+    <string name="try_again">Try Again</string>
+    <string name="balance">Balance</string>
+    <string name="proceed">Proceed</string>
+    <string name="cancel">Cancel</string>
 </resources>
