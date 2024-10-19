@@ -13,4 +13,34 @@
     <string name="send">Enviar</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="add_a_card">Add a Card</string>
+
+    <string name="hide_password">Hide password</string>
+    <string name="show_password">Show password</string>
+    <string name="credit">Credit</string>
+    <string name="debit">Debit</string>
+    <string name="payment_card">Payment Card</string>
+
+    <string name="field_is_empty">This field cannot be empty</string>
+    <string name="invalid_card_number">Invalid card number</string>
+    <string name="card_has_expired">Card has expired</string>
+    <string name="invalid_cvv">CVV should have 3 or 4 digits</string>
+    <string name="date_not_specified">Please, specify date</string>
+    <string name="card_not_found">Card not found</string>
+    <string name="card_already_added">Card already added</string>
+    <string name="generic_validation_error">Check correctness of the input</string>
+    <string name="user_not_found">User not found</string>
+    <string name="wrong_password">Wrong password</string>
+    <string name="invalid_password_field">Wrong password format. At least 8 charters, both latin symbols and numbers</string>
+    <string name="invalid_email_field">Invalid e-mail address</string>
+    <string name="unknown_error">An unknown error happened</string>
+    <string name="generic_not_found_error">Item not found</string>
+    <string name="wrong_confirmation_code">Wrong confirmation code</string>
+    <string name="pins_don_t_match">PINs don\'t match</string>
+    <string name="error_template">Error: %1$s</string>
+    <string name="error_auth_failed">Authentication failed</string>
+    <string name="error_biometrics_not_available">Biometrics not available</string>
+    <string name="insufficient_card_balance">Insufficient card balance.</string>
+    <string name="transaction_not_found">Transaction not found</string>
+    <string name="save_card">Save Card</string>
 </resources>

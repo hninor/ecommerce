@@ -5,6 +5,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.example.marketplacepuj.R
 
 // Set of Material typography styles to start with
 val Typography = Typography(
@@ -31,4 +32,20 @@ val Typography = Typography(
         letterSpacing = 0.5.sp
     )
     */
+)
+
+
+val primaryFontFamily = FontFamily(
+    androidx.compose.ui.text.font.Font(
+        R.font.poppins,
+        FontWeight.Normal
+    ),
+    androidx.compose.ui.text.font.Font(
+        R.font.poppins_medium,
+        FontWeight.Medium
+    ),
+    androidx.compose.ui.text.font.Font(
+        R.font.poppins_semibold,
+        FontWeight.SemiBold
+    )
 )
