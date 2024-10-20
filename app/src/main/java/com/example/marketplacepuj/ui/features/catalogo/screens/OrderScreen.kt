@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 import java.util.Date
 
 
@@ -75,7 +76,7 @@ fun OrderScreen(
                         )
                     )
                 )
-                .padding(bottom = 64.dp),
+                .padding(bottom = 72.dp),
             verticalArrangement = Arrangement.SpaceBetween
 
         ) {
@@ -186,7 +187,7 @@ fun OrderItemRow(item: OrderItem) {
                 Spacer(modifier = Modifier.padding(4.dp))
 
 
-                Text(text = "12 items", color = Color.White)
+                Text(text = "${item.productos.size} items", color = Color.White)
 
                 Spacer(modifier = Modifier.padding(16.dp))
                 Icon(
@@ -196,7 +197,9 @@ fun OrderItemRow(item: OrderItem) {
                 )
                 Spacer(modifier = Modifier.padding(4.dp))
 
-                Text(text = "22.12.2020", color = Color.White)
+                val fecha = SimpleDateFormat("dd.MM.yyyy")
+
+                Text(text = fecha.format(item.fecha), color = Color.White)
 
 
             }
@@ -216,7 +219,7 @@ data class OrderItem(
 @Preview(showBackground = true)
 @Composable
 fun OrderPreview() {
-    OrderScreen(rememberNavController(), orderItems)
+    OrderScreen(navController = rememberNavController(), orderItems = orderItems)
 
 }
 

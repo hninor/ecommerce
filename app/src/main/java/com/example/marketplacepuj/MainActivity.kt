@@ -25,7 +25,9 @@ import com.example.marketplacepuj.ui.features.catalogo.screens.OpinionScreen
 import com.example.marketplacepuj.ui.features.catalogo.screens.OrderScreen
 import com.example.marketplacepuj.ui.features.catalogo.screens.orderItems
 import com.example.marketplacepuj.ui.features.catalogo.viewmodel.CatalogueViewModel
+import com.example.marketplacepuj.ui.features.catalogo.viewmodel.PedidoViewModel
 import com.example.marketplacepuj.ui.theme.MarketplacePUJTheme
+import org.koin.androidx.compose.koinViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -68,6 +70,7 @@ fun GreetingPreview() {
 @Composable
 fun MyApp() {
     val catalogueViewModel: CatalogueViewModel = viewModel()
+    val pedidoViewModel: PedidoViewModel = koinViewModel()
     val navController = rememberNavController()
 
     NavHost(navController, startDestination = BottomNavItem.Home.route) {
@@ -87,8 +90,7 @@ fun MyApp() {
             }
         }
         composable(BottomNavItem.Person.route) {
-            //OrderScreen(navController, orderItems)
-            OpinionScreen(navController = navController)
+            OrderScreen(navController = navController, orderItems = pedidoViewModel.orderItems)
         }
     }
 

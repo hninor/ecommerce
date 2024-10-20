@@ -34,23 +34,23 @@ fun Date.toSimpleString(): String {
 }
 
 data class DetallePedido(
-    val cantidad: Int,
-    val descuento: Int,
-    val idProducto: String,
-    val monto: Int,
-    val precioTotalProducto: Int
+    val cantidad: Int = 0,
+    val descuento: Int = 0,
+    val idProducto: String = "",
+    val monto: Int = 0,
+    val precioTotalProducto: Int = 0
 )
 
 data class Pedido(
-    val detallePedido: List<DetallePedido>,
-    val estado: String,
-    val fechaOrden: String,
-    val idOrden: Long,
-    val idPedido: Long,
-    val idUsuario: String,
-    val impuestos: Int,
-    val precioTotal: Int,
-    val valorNeto: Int
+    val detallePedido: List<DetallePedido> = listOf(),
+    val estado: String = "",
+    val fechaOrden: String = "",
+    val idOrden: Long = 0L,
+    val idPedido: String = "",
+    val idUsuario: String = "",
+    val impuestos: Int = 0,
+    val precioTotal: Int = 0,
+    val valorNeto: Int = 0
 )
 
 class CatalogueViewModel : ViewModel() {
@@ -167,27 +167,33 @@ class CatalogueViewModel : ViewModel() {
 
         val total = cartItems.sumOf { it.price }
 
-        val pedido = Pedido(
-            detallePedido = obtenerDetalle(),
-            estado = "pendiente",
-            fechaOrden = Date().toSimpleString(),
-            idOrden = 968044891,
-            idPedido = 968044891,
-            idUsuario = "V7lOl23jscQ9LG9tLDjPcJWF2cp1",
-            impuestos = 0,
-            precioTotal = total.toInt(),
-            valorNeto = total.toInt()
-        )
+        pedidosRef.push().key?.let { idPedido ->
+
+            val pedido = Pedido(
+                detallePedido = obtenerDetalle(),
+                estado = "pendiente",
+                fechaOrden = Date().toSimpleString(),
+                idOrden = 968044891,
+                idPedido = idPedido,
+                idUsuario = "V7lOl23jscQ9LG9tLDjPcJWF2cp1",
+                impuestos = 0,
+                precioTotal = total.toInt(),
+                valorNeto = total.toInt()
+            )
 
 
-        pedidosRef.push().setValue(pedido)
-            .addOnSuccessListener {
-                Log.d("Firebase", "Datos escritos correctamente")
-                cartItems.clear()
-            }
-            .addOnFailureListener { error ->
-                Log.e("Firebase", "Error al escribir datos: ${error.message}")
-            }
+            pedidosRef.child(idPedido).setValue(pedido)
+                .addOnSuccessListener {
+                    Log.d("Firebase", "Datos escritos correctamente")
+                    cartItems.clear()
+                }
+                .addOnFailureListener { error ->
+                    Log.e("Firebase", "Error al escribir datos: ${error.message}")
+                }
+
+        }
+
+
     }
 
     private fun obtenerDetalle(): List<DetallePedido> {

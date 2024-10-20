@@ -1,5 +1,6 @@
 package com.example.marketplacepuj.koin.di.presentation
 
+import com.example.marketplacepuj.ui.features.catalogo.viewmodel.PedidoViewModel
 import com.example.marketplacepuj.ui.features.payment.PaymentViewModel
 import com.example.marketplacepuj.ui.features.payment.carddetail.CardDetailsViewModel
 import com.example.marketplacepuj.ui.features.screen_add_card.AddCardViewModel
@@ -23,6 +24,13 @@ val presentationModule = module {
     viewModel {
         PaymentViewModel(
             getHomeCardsUseCase = get()
+        )
+    }
+
+
+    viewModel {
+        PedidoViewModel(
+
         )
     }
 
