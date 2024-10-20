@@ -23,6 +23,7 @@ import com.example.marketplacepuj.ui.features.catalogo.screens.CartScreenHost
 import com.example.marketplacepuj.ui.features.catalogo.screens.CatalogueNavScreen
 import com.example.marketplacepuj.ui.features.catalogo.screens.OpinionScreen
 import com.example.marketplacepuj.ui.features.catalogo.screens.OrderScreen
+import com.example.marketplacepuj.ui.features.catalogo.screens.OrderScreenHost
 import com.example.marketplacepuj.ui.features.catalogo.screens.orderItems
 import com.example.marketplacepuj.ui.features.catalogo.viewmodel.CatalogueViewModel
 import com.example.marketplacepuj.ui.features.catalogo.viewmodel.PedidoViewModel
@@ -70,7 +71,7 @@ fun GreetingPreview() {
 @Composable
 fun MyApp() {
     val catalogueViewModel: CatalogueViewModel = viewModel()
-    val pedidoViewModel: PedidoViewModel = koinViewModel()
+
     val navController = rememberNavController()
 
     NavHost(navController, startDestination = BottomNavItem.Home.route) {
@@ -90,7 +91,7 @@ fun MyApp() {
             }
         }
         composable(BottomNavItem.Person.route) {
-            OrderScreen(navController = navController, orderItems = pedidoViewModel.orderItems)
+            OrderScreenHost(navController = navController)
         }
     }
 

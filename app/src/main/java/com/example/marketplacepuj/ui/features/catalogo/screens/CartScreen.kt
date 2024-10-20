@@ -38,14 +38,14 @@ import java.text.NumberFormat
 
 
 val items = listOf(
-    CartItem("Lorem ipsum dolor sit", 1000.0, ""),
-    CartItem("Lorem ipsum dolor sit", 1000.0, ""),
-    CartItem("Lorem ipsum dolor sit", 1000.0, ""),
-    CartItem("Lorem ipsum dolor sit", 1000.0, ""),
-    CartItem("Lorem ipsum dolor sit", 1000.0, ""),
-    CartItem("Lorem ipsum dolor sit", 1000.0, ""),
-    CartItem("Lorem ipsum dolor sit", 1000.0, ""),
-    CartItem("Lorem ipsum dolor sit", 1000.0, ""),
+    CartItem("Lorem ipsum dolor sit", 1000.0, "","1"),
+    CartItem("Lorem ipsum dolor sit", 1000.0, "","1"),
+    CartItem("Lorem ipsum dolor sit", 1000.0, "","1"),
+    CartItem("Lorem ipsum dolor sit", 1000.0, "","1"),
+    CartItem("Lorem ipsum dolor sit", 1000.0, "","1"),
+    CartItem("Lorem ipsum dolor sit", 1000.0, "","1"),
+    CartItem("Lorem ipsum dolor sit", 1000.0, "","1"),
+    CartItem("Lorem ipsum dolor sit", 1000.0, "","1"),
 )
 
 
@@ -293,7 +293,7 @@ fun CartItemRow(item: CartItem, onDeleteCartItem: (cartItem: CartItem) -> Unit) 
     }
 }
 
-data class CartItem(val name: String, val price: Double, val imageUrl: String)
+data class CartItem(val name: String, val price: Double, val imageUrl: String, val idProducto: String)
 
 @Preview(showBackground = true)
 @Composable

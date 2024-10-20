@@ -37,6 +37,8 @@ data class DetallePedido(
     val cantidad: Int = 0,
     val descuento: Int = 0,
     val idProducto: String = "",
+    val nombreProducto: String = "",
+    val urlImagen: String = "",
     val monto: Int = 0,
     val precioTotalProducto: Int = 0
 )
@@ -156,7 +158,7 @@ class CatalogueViewModel : ViewModel() {
 
 
     fun addToCartItem(product: com.example.marketplacepuj.ui.features.catalogo.screens.Product) {
-        cartItems.add(CartItem(product.name, product.price, product.imageUrl))
+        cartItems.add(CartItem(product.name, product.price, product.imageUrl, product.id))
     }
 
     fun onDeleteCartItem(it: CartItem) {
@@ -173,7 +175,7 @@ class CatalogueViewModel : ViewModel() {
                 detallePedido = obtenerDetalle(),
                 estado = "pendiente",
                 fechaOrden = Date().toSimpleString(),
-                idOrden = 968044891,
+                idOrden = 0,
                 idPedido = idPedido,
                 idUsuario = "V7lOl23jscQ9LG9tLDjPcJWF2cp1",
                 impuestos = 0,
@@ -204,9 +206,11 @@ class CatalogueViewModel : ViewModel() {
                 DetallePedido(
                     cantidad = 2,
                     descuento = 0,
-                    idProducto = it.name,
+                    idProducto = it.idProducto,
                     monto = it.price.toInt(),
-                    precioTotalProducto = it.price.toInt()
+                    precioTotalProducto = it.price.toInt(),
+                    nombreProducto = it.name,
+                    urlImagen = it.imageUrl
                 )
             )
 

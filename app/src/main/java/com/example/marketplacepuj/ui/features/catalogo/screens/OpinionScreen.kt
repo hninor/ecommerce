@@ -1,24 +1,19 @@
 package com.example.marketplacepuj.ui.features.catalogo.screens
 
 import android.annotation.SuppressLint
+import android.text.format.DateFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,54 +26,47 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import by.alexandr7035.banking.ui.components.decoration.SkeletonShape
-import by.alexandr7035.banking.ui.components.header.ScreenHeader
 import coil3.compose.AsyncImage
 import com.example.marketplacepuj.R
-import com.example.marketplacepuj.ui.features.payment.HomeIntent
-import com.example.marketplacepuj.ui.features.payment.HomeState
-import com.example.marketplacepuj.ui.features.payment.PaymentViewModel
 import com.example.marketplacepuj.ui.theme.primaryFontFamily
-import com.example.marketplacepuj.util.ErrorFullScreen
 import com.example.marketplacepuj.util.PrimaryCard
 import com.example.marketplacepuj.util.SecondaryToolBar
 import com.example.marketplacepuj.util.UiText
-import org.koin.androidx.compose.koinViewModel
+import java.util.Date
 
 
 @Composable
 fun OpinionScreen(
-    viewModel: PaymentViewModel = koinViewModel(),
-    navController: NavController
+    navController: NavController,
+    productos: List<Product>,
+    fechaCompra: Date,
+    onRatingChanged: (idProducto: String, rating: Int) -> Unit
 ) {
 
-    LaunchedEffect(Unit) {
-        viewModel.emitIntent(HomeIntent.EnterScreen)
-    }
+    OpinionScreen_Ui(
+        navController,
+        productos,
+        fechaCompra,
+        onRatingChanged
 
-    val state = viewModel.state.collectAsStateWithLifecycle().value
-    when (state) {
-        is HomeState.Success -> OpinionScreen_Ui(
-            navController,
-            products
-        )
+    )
 
-        is HomeState.Loading -> PaymentScreen_Skeleton()
-        is HomeState.Error -> ErrorFullScreen(error = state.error, onRetry = {
-            viewModel.emitIntent(HomeIntent.EnterScreen)
-        })
-    }
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun OpinionScreen_Ui(
     navController: NavController,
-    productos: List<Product>
+    productos: List<Product>,
+    fechaCompra: Date,
+    onRatingChanged: (idProducto: String, rating: Int) -> Unit
 ) {
+
+    SideEffect {
+        println("OpinionScreen_Ui is recomposing...$productos")
+    }
 
 
     Column(
@@ -111,7 +99,7 @@ fun OpinionScreen_Ui(
         LazyColumn(modifier = Modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
 
             items(productos) {
-                ProductOpinionItem(it)
+                ProductOpinionItem(it, fechaCompra, onRatingChanged)
             }
         }
 
@@ -125,17 +113,29 @@ fun OpinionScreen_Ui(
 @Composable
 fun OpinionPreview() {
     OpinionScreen_Ui(
-        rememberNavController(), products
-    )
+        rememberNavController(), products, Date()
+    ) { idProducto, rating ->
+
+
+    }
 
 }
 
 
 @Composable
-fun ProductOpinionItem(product: Product) {
+fun ProductOpinionItem(
+    product: Product,
+    date: Date,
+    onRatingChanged: (idProducto: String, rating: Int) -> Unit
+) {
 
 
-    var rating by remember { mutableStateOf(0f) }
+    SideEffect {
+        println("Recomposing ${product.id}, rating: ${product.rating}")
+    }
+
+    val day = DateFormat.format("dd", date) as String // 20
+    val monthString = DateFormat.format("MMM", date) as String // Jun
 
     PrimaryCard(
         modifier = Modifier.padding(horizontal = 24.dp),
@@ -158,7 +158,8 @@ fun ProductOpinionItem(product: Product) {
                     contentDescription = product.name,
                     modifier = Modifier
                         .size(60.dp)
-                        .clip(CircleShape),
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(Color.White),
                     contentScale = ContentScale.Crop
                 )
 
@@ -171,8 +172,7 @@ fun ProductOpinionItem(product: Product) {
 
 
                     Text(
-                        text = "Melodica", style = TextStyle(
-
+                        text = product.name, style = TextStyle(
                             fontFamily = primaryFontFamily,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.primary,
@@ -181,7 +181,7 @@ fun ProductOpinionItem(product: Product) {
 
 
                     Text(
-                        text = "Comprado el 27 de Marzo", style = TextStyle(
+                        text = "Comprado el ${day} de ${monthString}", style = TextStyle(
                             color = MaterialTheme.colorScheme.secondary,
                         )
                     )
@@ -195,20 +195,19 @@ fun ProductOpinionItem(product: Product) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
-                    .padding(horizontal = 8.dp),
+                    .padding(horizontal = 8.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
                 StarRatingBar(
                     maxStars = 5,
-                    rating = rating,
+                    rating = product.rating,
                     onRatingChanged = {
-                        rating = it
+                        onRatingChanged(product.id, it)
                     }
                 )
             }
-
 
 
         }
@@ -221,8 +220,8 @@ fun ProductOpinionItem(product: Product) {
 @Composable
 fun StarRatingBar(
     maxStars: Int = 5,
-    rating: Float,
-    onRatingChanged: (Float) -> Unit
+    rating: Int,
+    onRatingChanged: (Int) -> Unit
 ) {
     val density = LocalDensity.current.density
     val starSize = (12f * density).dp
@@ -244,7 +243,7 @@ fun StarRatingBar(
                     .selectable(
                         selected = isSelected,
                         onClick = {
-                            onRatingChanged(i.toFloat())
+                            onRatingChanged(i)
                         }
                     )
                     .width(starSize)
@@ -259,52 +258,6 @@ fun StarRatingBar(
 }
 
 
-@Composable
-private fun PaymentScreen_Skeleton() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(
-                rememberScrollState()
-            )
-            .padding(bottom = 24.dp)
-    ) {
-        ScreenHeader(
-            toolbar = {}, panelVerticalOffset = 24.dp
-        ) {
-
-        }
-
-        Spacer(Modifier.height(8.dp))
-
-
-
-        SkeletonShape(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .width(300.dp)
-                .height(200.dp)
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentSize()
-                .padding(horizontal = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            List(3) {
-                SkeletonShape(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(64.dp)
-                )
-            }
-        }
-    }
-}
 
 
 

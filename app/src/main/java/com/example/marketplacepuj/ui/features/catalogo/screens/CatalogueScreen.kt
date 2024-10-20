@@ -79,7 +79,8 @@ data class Product(
     val subCategory: String,
     val imageUrl: String,
     val price: Double,
-    val description: String = ""
+    val description: String = "",
+    val rating: Int = 0
 )
 
 val products = listOf(

@@ -4,6 +4,7 @@ package com.example.marketplacepuj.ui.features.catalogo.viewmodel
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import com.example.marketplacepuj.ui.features.catalogo.screens.OrderItem
+import com.example.marketplacepuj.ui.features.catalogo.screens.Product
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -17,6 +18,11 @@ class PedidoViewModel : ViewModel() {
     val pedidos = mutableListOf<Pedido>()
 
     val orderItems = mutableStateListOf<OrderItem>()
+
+    val productListOrderSelected =
+        mutableStateListOf<Product>()
+
+    var fechaCompra = Date()
 
 
     private val database = Firebase.database
@@ -71,17 +77,17 @@ class PedidoViewModel : ViewModel() {
 
     }
 
-    private fun getListaProductos(pedido: Pedido): List<com.example.marketplacepuj.ui.features.catalogo.screens.Product> {
+    private fun getListaProductos(pedido: Pedido): List<Product> {
         val response =
-            mutableListOf<com.example.marketplacepuj.ui.features.catalogo.screens.Product>()
+            mutableListOf<Product>()
         pedido.detallePedido.forEach {
             response.add(
-                com.example.marketplacepuj.ui.features.catalogo.screens.Product(
+                Product(
                     id = it.idProducto,
-                    name = it.idProducto,
+                    name = it.nombreProducto,
                     category = "",
                     subCategory = "",
-                    imageUrl = "",
+                    imageUrl = it.urlImagen,
                     price = it.monto.toDouble(),
                     description = ""
                 )
@@ -90,6 +96,21 @@ class PedidoViewModel : ViewModel() {
         }
 
         return response
+
+    }
+
+    fun setOrderItemSelected(it: OrderItem) {
+        productListOrderSelected.clear()
+        productListOrderSelected.addAll(it.productos)
+        fechaCompra = it.fecha
+    }
+
+    fun onRatingChanged(idProducto: String, rating: Int) {
+        val producto = productListOrderSelected.find { it.id == idProducto }
+        if (producto != null) {
+            val index = productListOrderSelected.indexOf(producto)
+            productListOrderSelected[index] = producto.copy(rating = rating)
+        }
 
     }
 

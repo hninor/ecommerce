@@ -2,6 +2,7 @@ package com.example.marketplacepuj.ui.features.catalogo.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,7 +21,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.marketplacepuj.ui.features.catalogo.viewmodel.PedidoViewModel
+import org.koin.androidx.compose.koinViewModel
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -41,11 +48,50 @@ val orderItems = listOf(
     OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date()),
 )
 
+@Composable
+fun OrderScreenHost(
+    navController: NavController
+
+) {
+    val navControllerCart = rememberNavController()
+    val pedidoViewModel: PedidoViewModel = koinViewModel()
+
+    NavHost(navControllerCart, startDestination = "orderList") {
+        composable("orderList") {
+            OrderScreen(navController = navController, orderItems = pedidoViewModel.orderItems) {
+                pedidoViewModel.setOrderItemSelected(it)
+                navControllerCart.navigate("orderDetail/${it.name}")
+            }
+        }
+
+
+        composable(
+            route = "orderDetail/{orderId}",
+            arguments = listOf(navArgument("orderId") { type = NavType.StringType })
+        ) {
+            val orderId = it.arguments?.getString("orderId")!!
+
+            OpinionScreen(
+                navControllerCart,
+                pedidoViewModel.productListOrderSelected,
+                pedidoViewModel.fechaCompra
+            ) { idProducto, rating ->
+                pedidoViewModel.onRatingChanged(idProducto, rating)
+
+            }
+        }
+    }
+
+
+}
+
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun OrderScreen(
     navController: NavController,
     orderItems: List<OrderItem>,
+    onItemSelected: (OrderItem) -> Unit
+
 ) {
 
 
@@ -115,7 +161,7 @@ fun OrderScreen(
                 modifier = Modifier.weight(2f)
             ) {
                 items(orderItems) { item ->
-                    OrderItemRow(item)
+                    OrderItemRow(item, onItemSelected)
                 }
 
 
@@ -127,7 +173,7 @@ fun OrderScreen(
 }
 
 @Composable
-fun OrderItemRow(item: OrderItem) {
+fun OrderItemRow(item: OrderItem, onItemSelected: (OrderItem) -> Unit) {
 
     val formatter = NumberFormat.getCurrencyInstance().apply {
         maximumFractionDigits = 0
@@ -139,6 +185,9 @@ fun OrderItemRow(item: OrderItem) {
         elevation = 8.dp,
         modifier = Modifier
             .fillMaxWidth()
+            .clickable {
+                onItemSelected(item)
+            }
 
 
     ) {
@@ -219,7 +268,9 @@ data class OrderItem(
 @Preview(showBackground = true)
 @Composable
 fun OrderPreview() {
-    OrderScreen(navController = rememberNavController(), orderItems = orderItems)
+    OrderScreen(navController = rememberNavController(), orderItems = orderItems) {
+
+    }
 
 }
 
