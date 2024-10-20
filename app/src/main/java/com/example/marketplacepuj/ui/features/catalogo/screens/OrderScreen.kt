@@ -75,7 +75,7 @@ fun OrderScreen(
                         )
                     )
                 )
-                .padding(bottom = 40.dp),
+                .padding(bottom = 64.dp),
             verticalArrangement = Arrangement.SpaceBetween
 
         ) {

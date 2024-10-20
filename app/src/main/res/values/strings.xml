@@ -54,4 +54,6 @@
     <string name="remove_card">Remove card</string>
     <string name="billing_address">Billing Address</string>
     <string name="added_on">Added On</string>
+    <string name="mis_opiniones">Mis opiniones</string>
+    <string name="opina">Opina y ayuda a más personas</string>
 </resources>
