@@ -1,6 +1,7 @@
 package com.example.marketplacepuj.ui.features.catalogo.viewmodel
 
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import com.example.marketplacepuj.ui.features.catalogo.screens.OrderItem
@@ -14,6 +15,16 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 
+class Calificacion(
+    var calificacion: Int = 0,
+    var fechaCalificacion: String = "",
+    var idCalificacion: String = "",
+    var idPedido: String = "",
+    var idProducto: String = "",
+    var resena: String = "",
+    var usuario: String = ""
+)
+
 class PedidoViewModel : ViewModel() {
     val pedidos = mutableListOf<Pedido>()
 
@@ -23,10 +34,12 @@ class PedidoViewModel : ViewModel() {
         mutableStateListOf<Product>()
 
     var fechaCompra = Date()
+    var idPedido = ""
 
 
     private val database = Firebase.database
     val pedidosRef = database.getReference("pedidos")
+    val calificacionesRef = database.getReference("calificaciones")
 
 
     init {
@@ -68,7 +81,8 @@ class PedidoViewModel : ViewModel() {
                     "Pedido",
                     it.precioTotal.toDouble(),
                     getListaProductos(it),
-                    it.fechaOrden.toDate()
+                    it.fechaOrden.toDate(),
+                    it.idPedido
                 )
             )
         }
@@ -99,10 +113,11 @@ class PedidoViewModel : ViewModel() {
 
     }
 
-    fun setOrderItemSelected(it: OrderItem) {
+    fun setOrderItemSelected(orderItem: OrderItem) {
         productListOrderSelected.clear()
-        productListOrderSelected.addAll(it.productos)
-        fechaCompra = it.fecha
+        productListOrderSelected.addAll(orderItem.productos)
+        fechaCompra = orderItem.fecha
+        idPedido = orderItem.id
     }
 
     fun onRatingChanged(idProducto: String, rating: Int) {
@@ -110,8 +125,34 @@ class PedidoViewModel : ViewModel() {
         if (producto != null) {
             val index = productListOrderSelected.indexOf(producto)
             productListOrderSelected[index] = producto.copy(rating = rating)
+
+            val nuevaCalificacion = Calificacion(
+                calificacion = rating,
+                fechaCalificacion = Date().toSimpleString(),
+                idPedido = idPedido,
+                idProducto = idProducto,
+                resena = "",
+                usuario = "U456789123"
+            )
+
+            escribirCalificacion(nuevaCalificacion)
         }
 
+    }
+
+
+    fun escribirCalificacion(calificacion: Calificacion) {
+        val newPostRef = calificacionesRef.push()
+        calificacion.idCalificacion =
+            newPostRef.key.toString() // Asigna automáticamente un ID único
+
+        newPostRef.setValue(calificacion)
+            .addOnSuccessListener {
+                Log.d("Firebase", "Escritura exitosa")
+            }
+            .addOnFailureListener {
+                Log.e("Firebase", "Error al escribir: ${it.message}")
+            }
     }
 
 

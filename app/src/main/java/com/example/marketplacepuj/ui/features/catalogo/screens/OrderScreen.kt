@@ -34,18 +34,18 @@ import java.util.Date
 
 
 val orderItems = listOf(
-    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date()),
-    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date()),
-    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date()),
-    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date()),
-    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date()),
-    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date()),
-    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date()),
-    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date()),
-    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date()),
-    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date()),
-    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date()),
-    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date()),
+    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date(), ""),
+    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date(), ""),
+    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date(), ""),
+    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date(), ""),
+    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date(), ""),
+    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date(), ""),
+    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date(), ""),
+    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date(), ""),
+    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date(), ""),
+    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date(), ""),
+    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date(), ""),
+    OrderItem("Lorem ipsum dolor sit", 1000.0, emptyList(), Date(), ""),
 )
 
 @Composable
@@ -262,7 +262,8 @@ data class OrderItem(
     val name: String,
     val price: Double,
     val productos: List<Product>,
-    val fecha: Date
+    val fecha: Date,
+    val id: String
 )
 
 @Preview(showBackground = true)
