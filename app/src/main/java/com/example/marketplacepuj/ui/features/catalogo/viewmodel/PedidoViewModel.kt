@@ -8,6 +8,7 @@ import com.example.marketplacepuj.ui.features.catalogo.screens.OrderItem
 import com.example.marketplacepuj.ui.features.catalogo.screens.Product
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -126,16 +127,39 @@ class PedidoViewModel : ViewModel() {
             val index = productListOrderSelected.indexOf(producto)
             productListOrderSelected[index] = producto.copy(rating = rating)
 
-            val nuevaCalificacion = Calificacion(
-                calificacion = rating,
-                fechaCalificacion = Date().toSimpleString(),
-                idPedido = idPedido,
-                idProducto = idProducto,
-                resena = "",
-                usuario = "U456789123"
-            )
+            calificacionesRef.orderByChild("idProducto").equalTo(idProducto).get()
+                .addOnSuccessListener {
+                    val calificaciones = mutableListOf<Calificacion>()
+                    for (calificacionSnapshot in it.children) {
+                        val calificacion = calificacionSnapshot.getValue(Calificacion::class.java)
+                        if (calificacion != null) {
+                            calificaciones.add(calificacion)
+                        }
+                    }
 
-            escribirCalificacion(nuevaCalificacion)
+                    val calificacionesPedido = calificaciones.filter { it.idPedido == idPedido }
+                    if (calificacionesPedido.isEmpty()) {
+
+                        val nuevaCalificacion = Calificacion(
+                            calificacion = rating,
+                            fechaCalificacion = Date().toSimpleString(),
+                            idPedido = idPedido,
+                            idProducto = idProducto,
+                            resena = "",
+                            usuario = "U456789123"
+                        )
+
+                        escribirCalificacion(nuevaCalificacion)
+
+                    } else {
+
+                        actualizarCalificacion(calificacionesPedido[0].idCalificacion, rating)
+                    }
+                }.addOnFailureListener {
+                    Log.e("firebase", "Error getting data", it)
+                }
+
+
         }
 
     }
@@ -152,6 +176,24 @@ class PedidoViewModel : ViewModel() {
             }
             .addOnFailureListener {
                 Log.e("Firebase", "Error al escribir: ${it.message}")
+            }
+    }
+
+    fun actualizarCalificacion(idCalificacion: String, rating: Int) {
+        val database = FirebaseDatabase.getInstance()
+        val myRef = database.getReference("calificaciones/$idCalificacion")
+
+        val updates = HashMap<String, Any>()
+        updates["calificacion"] = rating
+        updates["fechaCalificacion"] =
+            Date().toSimpleString() // Puedes actualizar otros campos según sea necesario
+
+        myRef.updateChildren(updates)
+            .addOnSuccessListener {
+                Log.d("Firebase", "Calificación actualizada exitosamente")
+            }
+            .addOnFailureListener {
+                Log.e("Firebase", "Error al actualizar la calificación: ${it.message}")
             }
     }
 
