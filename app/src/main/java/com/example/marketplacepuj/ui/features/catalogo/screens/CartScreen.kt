@@ -30,6 +30,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil3.compose.AsyncImage
+import com.example.marketplacepuj.BottomNavItem
 import com.example.marketplacepuj.ui.features.payment.carddetail.CardDetailsScreen
 import com.example.marketplacepuj.ui.features.screen_add_card.AddCardScreen
 import com.example.marketplacepuj.util.LocalScopedSnackbarState
@@ -38,14 +39,14 @@ import java.text.NumberFormat
 
 
 val items = listOf(
-    CartItem("Lorem ipsum dolor sit", 1000.0, "","1"),
-    CartItem("Lorem ipsum dolor sit", 1000.0, "","1"),
-    CartItem("Lorem ipsum dolor sit", 1000.0, "","1"),
-    CartItem("Lorem ipsum dolor sit", 1000.0, "","1"),
-    CartItem("Lorem ipsum dolor sit", 1000.0, "","1"),
-    CartItem("Lorem ipsum dolor sit", 1000.0, "","1"),
-    CartItem("Lorem ipsum dolor sit", 1000.0, "","1"),
-    CartItem("Lorem ipsum dolor sit", 1000.0, "","1"),
+    CartItem("Lorem ipsum dolor sit", 1000.0, "", "1"),
+    CartItem("Lorem ipsum dolor sit", 1000.0, "", "1"),
+    CartItem("Lorem ipsum dolor sit", 1000.0, "", "1"),
+    CartItem("Lorem ipsum dolor sit", 1000.0, "", "1"),
+    CartItem("Lorem ipsum dolor sit", 1000.0, "", "1"),
+    CartItem("Lorem ipsum dolor sit", 1000.0, "", "1"),
+    CartItem("Lorem ipsum dolor sit", 1000.0, "", "1"),
+    CartItem("Lorem ipsum dolor sit", 1000.0, "", "1"),
 )
 
 
@@ -164,7 +165,12 @@ fun CartScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
-                    onClick = { navController.popBackStack() },
+                    onClick = {
+                        if (!navController.popBackStack()) {
+                            navController.navigate(BottomNavItem.Home.route)
+                        }
+
+                    },
 
                     ) {
                     Icon(
@@ -293,7 +299,12 @@ fun CartItemRow(item: CartItem, onDeleteCartItem: (cartItem: CartItem) -> Unit) 
     }
 }
 
-data class CartItem(val name: String, val price: Double, val imageUrl: String, val idProducto: String)
+data class CartItem(
+    val name: String,
+    val price: Double,
+    val imageUrl: String,
+    val idProducto: String
+)
 
 @Preview(showBackground = true)
 @Composable

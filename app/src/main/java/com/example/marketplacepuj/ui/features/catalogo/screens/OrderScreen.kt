@@ -26,6 +26,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.marketplacepuj.BottomNavItem
 import com.example.marketplacepuj.ui.features.catalogo.viewmodel.PedidoViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.text.NumberFormat
@@ -136,7 +137,13 @@ fun OrderScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
-                    onClick = { navController.popBackStack() },
+                    onClick = {
+
+                        if (!navController.popBackStack()) {
+                            navController.navigate(BottomNavItem.Home.route)
+                        }
+
+                    },
 
                     ) {
                     Icon(

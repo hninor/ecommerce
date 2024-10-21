@@ -85,7 +85,7 @@ fun OpinionScreen_Ui(
         ) {
 
         SecondaryToolBar(onBack = {
-            navController.popBackStack()
+            navController.navigateUp()
         }, title = UiText.StringResource(R.string.mis_opiniones))
 
 

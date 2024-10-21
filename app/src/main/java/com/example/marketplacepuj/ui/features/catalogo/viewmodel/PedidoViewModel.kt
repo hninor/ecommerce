@@ -4,6 +4,7 @@ package com.example.marketplacepuj.ui.features.catalogo.viewmodel
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.marketplacepuj.ui.features.catalogo.screens.OrderItem
 import com.example.marketplacepuj.ui.features.catalogo.screens.Product
 import com.google.firebase.database.DataSnapshot
@@ -12,6 +13,9 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -44,24 +48,29 @@ class PedidoViewModel : ViewModel() {
 
 
     init {
+
         obtenerPedidos()
+
+
     }
 
 
     fun obtenerPedidos() {
         pedidosRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                pedidos.clear()
+                viewModelScope.launch(Dispatchers.IO) {
+                    pedidos.clear()
 
-                for (pedidoSnapshot in snapshot.children) {
-                    val pedido = pedidoSnapshot.getValue(Pedido::class.java)
-                    if (pedido != null) {
-                        pedidos.add(pedido)
+                    for (pedidoSnapshot in snapshot.children) {
+                        val pedido = pedidoSnapshot.getValue(Pedido::class.java)
+                        if (pedido != null) {
+                            pedidos.add(pedido)
+                        }
                     }
-                }
 
-                orderItems.clear()
-                orderItems.addAll(getOrderItems(pedidos))
+                    orderItems.clear()
+                    orderItems.addAll(getOrderItems(pedidos))
+                }
 
 
             }
@@ -74,7 +83,7 @@ class PedidoViewModel : ViewModel() {
 
     }
 
-    private fun getOrderItems(pedidos: MutableList<Pedido>): List<OrderItem> {
+    private suspend fun getOrderItems(pedidos: MutableList<Pedido>): List<OrderItem> {
         val response = mutableListOf<OrderItem>()
         pedidos.forEach {
             response.add(
@@ -92,7 +101,7 @@ class PedidoViewModel : ViewModel() {
 
     }
 
-    private fun getListaProductos(pedido: Pedido): List<Product> {
+    private suspend fun getListaProductos(pedido: Pedido): List<Product> {
         val response =
             mutableListOf<Product>()
         pedido.detallePedido.forEach {
@@ -104,11 +113,41 @@ class PedidoViewModel : ViewModel() {
                     subCategory = "",
                     imageUrl = it.urlImagen,
                     price = it.monto.toDouble(),
-                    description = ""
+                    description = "",
+                    rating = getRating(it.idProducto, pedido.idPedido)
                 )
             )
 
         }
+
+        return response
+
+    }
+
+    private suspend fun getRating(idProducto: String, idPedido: String): Int {
+        var response = 0
+
+        val dataSnapshot =
+            calificacionesRef.orderByChild("idProducto").equalTo(idProducto).get().await()
+
+        val calificaciones = mutableListOf<Calificacion>()
+        for (calificacionSnapshot in dataSnapshot.children) {
+            val calificacion = calificacionSnapshot.getValue(Calificacion::class.java)
+            if (calificacion != null) {
+                calificaciones.add(calificacion)
+            }
+        }
+
+        val calificacionesPedido = calificaciones.filter { it.idPedido == idPedido }
+        if (calificacionesPedido.isNotEmpty()) {
+            response = calificacionesPedido[0].calificacion
+
+        }
+        /*           .addOnSuccessListener {
+
+                   }.addOnFailureListener {
+                       Log.e("firebase", "Error getting data", it)
+                   }*/
 
         return response
 
