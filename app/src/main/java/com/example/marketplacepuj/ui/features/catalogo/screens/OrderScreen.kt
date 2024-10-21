@@ -60,8 +60,7 @@ fun OrderScreenHost(
     NavHost(navControllerCart, startDestination = "orderList") {
         composable("orderList") {
             OrderScreen(navController = navController, orderItems = pedidoViewModel.orderItems) {
-                pedidoViewModel.setOrderItemSelected(it)
-                navControllerCart.navigate("orderDetail/${it.name}")
+                navControllerCart.navigate("orderDetail/${it.id}")
             }
         }
 
@@ -74,11 +73,10 @@ fun OrderScreenHost(
 
             OpinionScreen(
                 navControllerCart,
-                pedidoViewModel.productListOrderSelected,
-                pedidoViewModel.fechaCompra
+                pedidoViewModel.getProductos(orderId),
+                pedidoViewModel.getFechaCompra(orderId)
             ) { idProducto, rating ->
-                pedidoViewModel.onRatingChanged(idProducto, rating)
-
+                pedidoViewModel.onRatingChanged(orderId, idProducto, rating)
             }
         }
     }

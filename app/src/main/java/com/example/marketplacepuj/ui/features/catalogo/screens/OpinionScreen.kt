@@ -2,6 +2,7 @@ package com.example.marketplacepuj.ui.features.catalogo.screens
 
 import android.annotation.SuppressLint
 import android.text.format.DateFormat
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -45,6 +46,8 @@ fun OpinionScreen(
     onRatingChanged: (idProducto: String, rating: Int) -> Unit
 ) {
 
+
+
     OpinionScreen_Ui(
         navController,
         productos,
@@ -63,10 +66,6 @@ fun OpinionScreen_Ui(
     fechaCompra: Date,
     onRatingChanged: (idProducto: String, rating: Int) -> Unit
 ) {
-
-    SideEffect {
-        println("OpinionScreen_Ui is recomposing...$productos")
-    }
 
 
     Column(
@@ -129,10 +128,6 @@ fun ProductOpinionItem(
     onRatingChanged: (idProducto: String, rating: Int) -> Unit
 ) {
 
-
-    SideEffect {
-        println("Recomposing ${product.id}, rating: ${product.rating}")
-    }
 
     val day = DateFormat.format("dd", date) as String // 20
     val monthString = DateFormat.format("MMM", date) as String // Jun

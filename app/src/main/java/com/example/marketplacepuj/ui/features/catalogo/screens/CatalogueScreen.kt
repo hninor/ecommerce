@@ -80,7 +80,7 @@ data class Product(
     val imageUrl: String,
     val price: Double,
     val description: String = "",
-    val rating: Int = 0
+    var rating: Int = 0
 )
 
 val products = listOf(

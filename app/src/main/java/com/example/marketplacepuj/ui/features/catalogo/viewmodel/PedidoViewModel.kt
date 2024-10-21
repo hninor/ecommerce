@@ -35,12 +35,6 @@ class PedidoViewModel : ViewModel() {
 
     val orderItems = mutableStateListOf<OrderItem>()
 
-    val productListOrderSelected =
-        mutableStateListOf<Product>()
-
-    var fechaCompra = Date()
-    var idPedido = ""
-
 
     private val database = Firebase.database
     val pedidosRef = database.getReference("pedidos")
@@ -128,7 +122,7 @@ class PedidoViewModel : ViewModel() {
         var response = 0
 
         val dataSnapshot =
-            calificacionesRef.orderByChild("idProducto").equalTo(idProducto).get().await()
+            calificacionesRef.orderByChild("idPedido").equalTo(idPedido).get().await()
 
         val calificaciones = mutableListOf<Calificacion>()
         for (calificacionSnapshot in dataSnapshot.children) {
@@ -138,69 +132,62 @@ class PedidoViewModel : ViewModel() {
             }
         }
 
-        val calificacionesPedido = calificaciones.filter { it.idPedido == idPedido }
+        val calificacionesPedido = calificaciones.filter { it.idProducto == idProducto }
         if (calificacionesPedido.isNotEmpty()) {
             response = calificacionesPedido[0].calificacion
 
         }
-        /*           .addOnSuccessListener {
-
-                   }.addOnFailureListener {
-                       Log.e("firebase", "Error getting data", it)
-                   }*/
 
         return response
 
     }
 
-    fun setOrderItemSelected(orderItem: OrderItem) {
-        productListOrderSelected.clear()
-        productListOrderSelected.addAll(orderItem.productos)
-        fechaCompra = orderItem.fecha
-        idPedido = orderItem.id
-    }
 
-    fun onRatingChanged(idProducto: String, rating: Int) {
-        val producto = productListOrderSelected.find { it.id == idProducto }
-        if (producto != null) {
-            val index = productListOrderSelected.indexOf(producto)
-            productListOrderSelected[index] = producto.copy(rating = rating)
-
-            calificacionesRef.orderByChild("idProducto").equalTo(idProducto).get()
-                .addOnSuccessListener {
-                    val calificaciones = mutableListOf<Calificacion>()
-                    for (calificacionSnapshot in it.children) {
-                        val calificacion = calificacionSnapshot.getValue(Calificacion::class.java)
-                        if (calificacion != null) {
-                            calificaciones.add(calificacion)
-                        }
-                    }
-
-                    val calificacionesPedido = calificaciones.filter { it.idPedido == idPedido }
-                    if (calificacionesPedido.isEmpty()) {
-
-                        val nuevaCalificacion = Calificacion(
-                            calificacion = rating,
-                            fechaCalificacion = Date().toSimpleString(),
-                            idPedido = idPedido,
-                            idProducto = idProducto,
-                            resena = "",
-                            usuario = "U456789123"
-                        )
-
-                        escribirCalificacion(nuevaCalificacion)
-
-                    } else {
-
-                        actualizarCalificacion(calificacionesPedido[0].idCalificacion, rating)
-                    }
-                }.addOnFailureListener {
-                    Log.e("firebase", "Error getting data", it)
-                }
-
-
+    fun onRatingChanged(idPedido: String, idProducto: String, rating: Int) {
+        val order = orderItems.find { it.id == idPedido }
+        if (order != null) {
+            val producto = order.productos.find { it.id == idProducto }
+            if (producto != null) {
+                producto.rating = rating
+                onWriteRealtimeDatabase(idPedido, idProducto, rating)
+            }
         }
 
+
+    }
+
+    private fun onWriteRealtimeDatabase(idPedido: String, idProducto: String, rating: Int) {
+        calificacionesRef.orderByChild("idPedido").equalTo(idPedido).get()
+            .addOnSuccessListener {
+                val calificaciones = mutableListOf<Calificacion>()
+                for (calificacionSnapshot in it.children) {
+                    val calificacion = calificacionSnapshot.getValue(Calificacion::class.java)
+                    if (calificacion != null) {
+                        calificaciones.add(calificacion)
+                    }
+                }
+
+                val calificacionesPedido = calificaciones.filter { it.idProducto == idProducto }
+                if (calificacionesPedido.isEmpty()) {
+
+                    val nuevaCalificacion = Calificacion(
+                        calificacion = rating,
+                        fechaCalificacion = Date().toSimpleString(),
+                        idPedido = idPedido,
+                        idProducto = idProducto,
+                        resena = "",
+                        usuario = "U456789123"
+                    )
+
+                    escribirCalificacion(nuevaCalificacion)
+
+                } else {
+
+                    actualizarCalificacion(calificacionesPedido[0].idCalificacion, rating)
+                }
+            }.addOnFailureListener {
+                Log.e("firebase", "Error getting data", it)
+            }
     }
 
 
@@ -234,6 +221,23 @@ class PedidoViewModel : ViewModel() {
             .addOnFailureListener {
                 Log.e("Firebase", "Error al actualizar la calificación: ${it.message}")
             }
+    }
+
+    fun getProductos(orderId: String): List<Product> {
+        val response = mutableListOf<Product>()
+        val order = orderItems.find { it.id == orderId }
+        if (order != null) {
+            response.addAll(order.productos)
+        }
+        return response
+    }
+
+    fun getFechaCompra(orderId: String): Date {
+        val order = orderItems.find { it.id == orderId }
+        if (order != null) {
+            return order.fecha
+        }
+        return Date()
     }
 
 
