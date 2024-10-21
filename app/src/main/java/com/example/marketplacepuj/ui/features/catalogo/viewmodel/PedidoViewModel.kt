@@ -2,7 +2,9 @@ package com.example.marketplacepuj.ui.features.catalogo.viewmodel
 
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.marketplacepuj.ui.features.catalogo.screens.OrderItem
@@ -118,8 +120,8 @@ class PedidoViewModel : ViewModel() {
 
     }
 
-    private suspend fun getRating(idProducto: String, idPedido: String): Int {
-        var response = 0
+    private suspend fun getRating(idProducto: String, idPedido: String): MutableState<Int> {
+        var response = mutableStateOf(0)
 
         val dataSnapshot =
             calificacionesRef.orderByChild("idPedido").equalTo(idPedido).get().await()
@@ -134,7 +136,7 @@ class PedidoViewModel : ViewModel() {
 
         val calificacionesPedido = calificaciones.filter { it.idProducto == idProducto }
         if (calificacionesPedido.isNotEmpty()) {
-            response = calificacionesPedido[0].calificacion
+            response = mutableStateOf(calificacionesPedido[0].calificacion)
 
         }
 
@@ -148,7 +150,7 @@ class PedidoViewModel : ViewModel() {
         if (order != null) {
             val producto = order.productos.find { it.id == idProducto }
             if (producto != null) {
-                producto.rating = rating
+                producto.rating.value = rating
                 onWriteRealtimeDatabase(idPedido, idProducto, rating)
             }
         }

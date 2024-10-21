@@ -197,9 +197,9 @@ fun ProductOpinionItem(
 
                 StarRatingBar(
                     maxStars = 5,
-                    rating = product.rating,
+                    rating = product.rating.value,
                     onRatingChanged = {
-                        if (it != product.rating) {
+                        if (it != product.rating.value) {
                             onRatingChanged(product.id, it)
                         }
 

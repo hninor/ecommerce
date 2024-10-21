@@ -33,7 +33,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
@@ -80,7 +83,7 @@ data class Product(
     val imageUrl: String,
     val price: Double,
     val description: String = "",
-    var rating: Int = 0
+    val rating: MutableState<Int> = mutableStateOf(0)
 )
 
 val products = listOf(
