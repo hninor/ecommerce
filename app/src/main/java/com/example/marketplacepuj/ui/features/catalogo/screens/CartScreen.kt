@@ -31,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil3.compose.AsyncImage
 import com.example.marketplacepuj.BottomNavItem
+import com.example.marketplacepuj.ui.features.catalogo.viewmodel.CatalogueViewModel
 import com.example.marketplacepuj.ui.features.payment.carddetail.CardDetailsScreen
 import com.example.marketplacepuj.ui.features.screen_add_card.AddCardScreen
 import com.example.marketplacepuj.util.LocalScopedSnackbarState
@@ -54,8 +55,10 @@ val items = listOf(
 fun CartScreenHost(
     navController: NavController,
     cartItems: List<CartItem>,
+    catalogueViewModel: CatalogueViewModel,
     onDeleteCartItem: (cartItem: CartItem) -> Unit,
     onProceed: () -> Unit
+
 ) {
     val navControllerCart = rememberNavController()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -79,15 +82,20 @@ fun CartScreenHost(
             }
 
             composable("metodo_pago") {
+
                 OptionPaymentScreen(
                     navController = navController,
                     total = cartItems.sumOf { it.price },
                     onPagoEfectivo = {
-
-                        onProceed()
+                        catalogueViewModel.showDialog = true
                     },
                     onPagoTarjeta = {
                         navControllerCart.navigate("payment")
+                    },
+                    catalogueViewModel.showDialog,
+                    {
+                        catalogueViewModel.showDialog = false
+                        onProceed()
                     }
                 )
             }

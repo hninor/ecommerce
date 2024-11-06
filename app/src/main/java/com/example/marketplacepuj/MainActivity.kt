@@ -21,14 +21,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.marketplacepuj.ui.features.catalogo.screens.CartScreenHost
 import com.example.marketplacepuj.ui.features.catalogo.screens.CatalogueNavScreen
-import com.example.marketplacepuj.ui.features.catalogo.screens.OpinionScreen
-import com.example.marketplacepuj.ui.features.catalogo.screens.OrderScreen
 import com.example.marketplacepuj.ui.features.catalogo.screens.OrderScreenHost
-import com.example.marketplacepuj.ui.features.catalogo.screens.orderItems
 import com.example.marketplacepuj.ui.features.catalogo.viewmodel.CatalogueViewModel
-import com.example.marketplacepuj.ui.features.catalogo.viewmodel.PedidoViewModel
 import com.example.marketplacepuj.ui.theme.MarketplacePUJTheme
-import org.koin.androidx.compose.koinViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -82,6 +77,7 @@ fun MyApp() {
             CartScreenHost(
                 navController,
                 catalogueViewModel.cartItems,
+                catalogueViewModel,
                 {
                     catalogueViewModel.onDeleteCartItem(it)
                 }

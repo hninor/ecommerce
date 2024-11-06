@@ -67,6 +67,9 @@ class CatalogueViewModel : ViewModel() {
     private val productsRef = database.getReference("productos")
     val pedidosRef = database.getReference("pedidos")
 
+
+    var showDialog  by mutableStateOf(false)
+
     init {
         fetchProducts()
     }

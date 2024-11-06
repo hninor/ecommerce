@@ -29,6 +29,7 @@ import by.alexandr7035.banking.ui.components.decoration.SkeletonShape
 import by.alexandr7035.banking.ui.components.header.ScreenHeader
 import com.example.marketplacepuj.R
 import com.example.marketplacepuj.ui.features.cards.model.MoneyAmount
+import com.example.marketplacepuj.ui.features.dialog.SuccessDialog
 import com.example.marketplacepuj.ui.features.payment.AddPaymentCardButton
 import com.example.marketplacepuj.ui.features.payment.HomeIntent
 import com.example.marketplacepuj.ui.features.payment.HomeState
@@ -43,6 +44,7 @@ import com.example.marketplacepuj.util.MoneyAmountUi
 import com.example.marketplacepuj.util.PrimaryButton
 import com.example.marketplacepuj.util.PrimaryCard
 import com.example.marketplacepuj.util.TextBtn
+import com.example.marketplacepuj.util.UiText
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -81,7 +83,9 @@ fun OptionPaymentScreen(
     navController: NavController,
     total: Double,
     onPagoEfectivo: () -> Unit,
-    onPagoTarjeta: () -> Unit
+    onPagoTarjeta: () -> Unit,
+    showDialog: Boolean,
+    onDissmissDialog: () -> Unit
 ) {
 
 
@@ -188,6 +192,16 @@ fun OptionPaymentScreen(
             text = stringResource(R.string.con_tarjeta)
         )
 
+    }
+
+    if (showDialog) {
+        SuccessDialog(
+            title = UiText.StringResource(R.string.orden_creada),
+            message = UiText.StringResource(R.string.revisar_historial),
+            onDismiss = {
+                onDissmissDialog()
+            }
+        )
     }
 
 }
@@ -358,7 +372,7 @@ fun PaymentPreview() {
 fun MetodoPagoPreview() {
     OptionPaymentScreen(
         rememberNavController(), 120.0,
-        {}, {}
+        {}, {}, true, {}
     )
 
 }
