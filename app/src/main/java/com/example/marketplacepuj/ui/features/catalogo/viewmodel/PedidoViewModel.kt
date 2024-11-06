@@ -65,7 +65,7 @@ class PedidoViewModel : ViewModel() {
                     }
 
                     orderItems.clear()
-                    orderItems.addAll(getOrderItems(pedidos))
+                    orderItems.addAll(getOrderItems(pedidos).reversed())
                 }
 
 

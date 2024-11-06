@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -59,9 +61,18 @@ fun OrderScreenHost(
 
     NavHost(navControllerCart, startDestination = "orderList") {
         composable("orderList") {
-            OrderScreen(navController = navController, orderItems = pedidoViewModel.orderItems) {
-                navControllerCart.navigate("orderDetail/${it.id}")
+
+            if (pedidoViewModel.orderItems.isEmpty()) {
+                LoadingWheel(navController)
+            } else {
+                OrderScreen(
+                    navController = navController,
+                    orderItems = pedidoViewModel.orderItems
+                ) {
+                    navControllerCart.navigate("orderDetail/${it.id}")
+                }
             }
+
         }
 
 
@@ -81,6 +92,42 @@ fun OrderScreenHost(
         }
     }
 
+
+}
+
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@Composable
+fun LoadingWheel(navController: NavController) {
+
+
+    val customShape =
+        RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp, bottomEnd = 32.dp, bottomStart = 32.dp)
+
+
+    Scaffold(
+        bottomBar = {
+
+            BottomNavigationBar(
+                navController = navController, modifier = Modifier
+                    .padding(16.dp)
+                    .clip(customShape)
+            )
+
+
+        }
+    ) {
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .semantics { testTag = "loading-wheel" },
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                color = Color.Red
+            )
+        }
+    }
 
 }
 
