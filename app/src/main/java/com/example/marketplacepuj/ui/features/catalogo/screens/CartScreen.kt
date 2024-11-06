@@ -74,9 +74,25 @@ fun CartScreenHost(
                     cartItems,
                     { onDeleteCartItem(it) }) {
                     navControllerCart
-                        .navigate("payment")
+                        .navigate("metodo_pago")
                 }
             }
+
+            composable("metodo_pago") {
+                OptionPaymentScreen(
+                    navController = navController,
+                    total = cartItems.sumOf { it.price },
+                    onPagoEfectivo = {
+
+                        onProceed()
+                    },
+                    onPagoTarjeta = {
+                        navControllerCart.navigate("payment")
+                    }
+                )
+            }
+
+
             composable("payment") {
                 PaymentScreen(
                     navController = navControllerCart,

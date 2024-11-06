@@ -56,4 +56,7 @@
     <string name="added_on">Added On</string>
     <string name="mis_opiniones">Mis opiniones</string>
     <string name="opina">Opina y ayuda a más personas</string>
+    <string name="metodo_pago">Método de pago</string>
+    <string name="efectivo">Efectivo</string>
+    <string name="con_tarjeta">Con Tarjeta</string>
 </resources>

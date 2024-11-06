@@ -76,6 +76,122 @@ fun PaymentScreen(
     }
 }
 
+@Composable
+fun OptionPaymentScreen(
+    navController: NavController,
+    total: Double,
+    onPagoEfectivo: () -> Unit,
+    onPagoTarjeta: () -> Unit
+) {
+
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        Color.White,
+                        Color(0xFFF2F2F2)
+                    )
+                )
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
+
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = { navController.popBackStack() },
+
+                ) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.Black
+                )
+            }
+
+            Text(
+                text = stringResource(id = R.string.metodo_pago),
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color.Black,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        PrimaryCard(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            paddingValues = PaddingValues(vertical = 16.dp),
+            corners = 16.dp
+        ) {
+
+            Column {
+                Text(
+                    text = stringResource(R.string.balance), style = TextStyle(
+                        fontSize = 14.sp,
+                        lineHeight = 20.sp,
+                        fontFamily = primaryFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        color = Color(0xFF999999),
+                    ), modifier = Modifier.padding(horizontal = 16.dp)
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(horizontal = 8.dp),
+
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = MoneyAmountUi.mapFromDomain(MoneyAmount(total.toFloat())).amountStr,
+                        style = TextStyle(
+                            fontSize = 32.sp,
+                            fontFamily = primaryFontFamily,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.padding(16.dp))
+
+
+        PrimaryButton(
+            onClick = { onPagoEfectivo() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            text = stringResource(R.string.efectivo)
+
+        )
+
+
+        Spacer(modifier = Modifier.padding(16.dp))
+
+
+        PrimaryButton(
+            onClick = { onPagoTarjeta() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            text = stringResource(R.string.con_tarjeta)
+        )
+
+    }
+
+}
+
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun PaymentScreen_Ui(
@@ -232,6 +348,17 @@ fun PaymentPreview() {
         }, savings = List(3) {
             SavingUi.mock()
         }), {}, {}
+    )
+
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun MetodoPagoPreview() {
+    OptionPaymentScreen(
+        rememberNavController(), 120.0,
+        {}, {}
     )
 
 }
