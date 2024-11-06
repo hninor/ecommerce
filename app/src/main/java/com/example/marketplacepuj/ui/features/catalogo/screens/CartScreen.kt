@@ -92,8 +92,8 @@ fun CartScreenHost(
                     onPagoTarjeta = {
                         navControllerCart.navigate("payment")
                     },
-                    catalogueViewModel.showDialog,
-                    {
+                    showDialog = catalogueViewModel.showDialog,
+                    onDissmissDialog = {
                         catalogueViewModel.showDialog = false
                         onProceed()
                     }
@@ -105,9 +105,16 @@ fun CartScreenHost(
                 PaymentScreen(
                     navController = navControllerCart,
                     total = cartItems.sumOf { it.price },
-                    onProceed = onProceed,
+                    onProceed = {
+                        catalogueViewModel.showDialog = true
+                    },
                     onCardDetails = {
                         navControllerCart.navigate("cardDetails/$it")
+                    },
+                    showDialog = catalogueViewModel.showDialog,
+                    onDissmissDialog = {
+                        catalogueViewModel.showDialog = false
+                        onProceed()
                     }
                 )
             }

@@ -54,7 +54,9 @@ fun PaymentScreen(
     navController: NavController,
     onCardDetails: (cardId: String) -> Unit = {},
     total: Double,
-    onProceed: () -> Unit
+    onProceed: () -> Unit,
+    showDialog: Boolean,
+    onDissmissDialog: () -> Unit
 ) {
 
     LaunchedEffect(Unit) {
@@ -68,7 +70,9 @@ fun PaymentScreen(
             onCardDetails = onCardDetails,
             navController = navController,
             total = total,
-            onProceed = onProceed
+            onProceed = onProceed,
+            showDialog = showDialog,
+            onDissmissDialog = onDissmissDialog
         )
 
         is HomeState.Loading -> PaymentScreen_Skeleton()
@@ -213,7 +217,9 @@ fun PaymentScreen_Ui(
     total: Double,
     state: HomeState.Success,
     onCardDetails: (cardId: String) -> Unit = {},
-    onProceed: () -> Unit
+    onProceed: () -> Unit,
+    showDialog: Boolean,
+    onDissmissDialog: () -> Unit
 ) {
 
 
@@ -349,6 +355,16 @@ fun PaymentScreen_Ui(
 
     }
 
+    if (showDialog) {
+        SuccessDialog(
+            title = UiText.StringResource(R.string.orden_creada),
+            message = UiText.StringResource(R.string.revisar_historial),
+            onDismiss = {
+                onDissmissDialog()
+            }
+        )
+    }
+
 }
 
 
@@ -361,7 +377,7 @@ fun PaymentPreview() {
             CardUi.mock()
         }, savings = List(3) {
             SavingUi.mock()
-        }), {}, {}
+        }), {}, {}, false, {}
     )
 
 }
